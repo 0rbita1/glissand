@@ -46,6 +46,20 @@
   justify-content: center;
 }
 
+.textArea {
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  resize: none;
+  font-size: 1.1em;
+  padding: 1em;
+  background: #f6f6f6;
+  color: #0f0f0f;
+  font-family: inherit;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
