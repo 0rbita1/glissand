@@ -1,19 +1,27 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import StatisticsBar from "./statisticsBar";
 
 function App() {
   const [text, setText] = useState("");
+  const [lastModified, setLastModified] = useState<Date | null>(null);
+
+  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setText(e.target.value);
+    setLastModified(new Date());
+  }
 
   return (
-    <textarea
-      className="textArea"
-      value={text}
-      onChange={(e) => setText(e.target.value)}
-      placeholder="Type here..."
-      autoFocus
-    />
+    <>
+      <textarea
+        className="textArea"
+        value={text}
+        onChange={handleChange}
+        placeholder="Type here..."
+        autoFocus
+      />
+      <StatisticsBar text={text} lastModified={lastModified} />
+    </>
   );
 }
 
