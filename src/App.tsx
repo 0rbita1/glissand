@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import StatisticsBar from "./statisticsBar";
+import Titlebar from "./titlebar";
 
 function App() {
   const [text, setText] = useState("");
@@ -13,6 +14,7 @@ function App() {
 
   return (
     <>
+      <Titlebar />
       <textarea
         className="textArea"
         value={text}
