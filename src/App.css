@@ -33,6 +33,7 @@
   bottom: 0;
   right: 0;
   display: flex;
+  border-radius: 15px 0px 0px 0px;
   gap: 1.5em;
   padding: 0.3em 0.8em;
   font-size: 0.8em;
@@ -43,30 +44,60 @@
 }
 
 .titlebar {
-  height: 30px;
-  background: #329ea3;
+  height: 32px;
+  background: #1e1e1e;
   user-select: none;
-  display: grid;
-  grid-template-columns: auto max-content;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  z-index: 1000;
 }
-.titlebar > .controls {
+
+.titlebar-title {
+  padding-left: 12px;
+}
+
+.titlebar-controls {
   display: flex;
+  height: 100%;
 }
-.titlebar button {
+
+.titlebar-btn {
   appearance: none;
-  padding: 0;
-  margin: 0;
   border: none;
+  background: transparent;
+  color: #dadada;
+  width: 46px;
+  height: 32px;
   display: inline-flex;
-  justify-content: center;
   align-items: center;
-  width: 30px;
-  background-color: transparent;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.1s;
 }
-.titlebar button:hover {
-  background: #5bbec3;
+
+.titlebar-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.titlebar-btn.close-btn:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+
+.titlebar-btn.pin-btn {
+  color: #888;
+  width: 36px;
+}
+
+.titlebar-btn.pin-btn.active {
+  color: #ffd600;
+}
+
+.titlebar-btn.pin-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
