@@ -25,9 +25,10 @@ body,
   width: 100%;
 }
 
+/*
 .textArea {
   width: 100vw;
-  height: calc(100vh - 32px); /* Subtract titlebar height */
+  height: calc(100vh - 32px); 
   box-sizing: border-box;
   border: none;
   outline: none;
@@ -38,7 +39,16 @@ body,
   background: #1e1e1e;
   color: #dadada;
   font-family: inherit;
-  overflow: hidden; /* Hide scrollbar but keep scroll functionality */
+  overflow: hidden; 
+}
+*/
+
+.editorContainer {
+  position: fixed;
+  top: 32px;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .statisticsBar {
