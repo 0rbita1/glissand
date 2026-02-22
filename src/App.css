@@ -14,18 +14,31 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* Prevent body-level overflow */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
 .textArea {
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 32px); /* Subtract titlebar height */
   box-sizing: border-box;
   border: none;
   outline: none;
   resize: none;
   font-size: 1.1em;
   padding: 1em;
+  padding-top: 2em;
   background: #1e1e1e;
   color: #dadada;
   font-family: inherit;
+  overflow: hidden; /* Hide scrollbar but keep scroll functionality */
 }
 
 .statisticsBar {
@@ -33,6 +46,7 @@
   bottom: 0;
   right: 0;
   display: flex;
+  border-radius: 15px 0px 0px 0px;
   gap: 1.5em;
   padding: 0.3em 0.8em;
   font-size: 0.8em;
@@ -40,4 +54,63 @@
   font-family: inherit;
   background-color: #262626;
   pointer-events: none;
+}
+
+.titlebar {
+  height: 32px;
+  background: #1e1e1e;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.titlebar-title {
+  padding-left: 12px;
+}
+
+.titlebar-controls {
+  display: flex;
+  height: 100%;
+}
+
+.titlebar-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #dadada;
+  width: 46px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.titlebar-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.titlebar-btn.close-btn:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+
+.titlebar-btn.pin-btn {
+  color: #888;
+  width: 36px;
+}
+
+.titlebar-btn.pin-btn.active {
+  color: #ffd600;
+}
+
+.titlebar-btn.pin-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
