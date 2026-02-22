@@ -14,19 +14,31 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* Prevent body-level overflow */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
 .textArea {
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 32px); /* Subtract titlebar height */
   box-sizing: border-box;
   border: none;
   outline: none;
   resize: none;
   font-size: 1.1em;
   padding: 1em;
-  padding-top: 4em;
+  padding-top: 2em;
   background: #1e1e1e;
   color: #dadada;
   font-family: inherit;
+  overflow: hidden; /* Hide scrollbar but keep scroll functionality */
 }
 
 .statisticsBar {
