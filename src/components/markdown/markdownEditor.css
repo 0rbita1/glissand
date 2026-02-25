@@ -50,7 +50,7 @@
 .md-editor-root .cm-editor {
   height: 100%;
   font-family: var(--md-font-mono);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   line-height: var(--md-line-height);
   color: var(--md-text);
   background: transparent;
