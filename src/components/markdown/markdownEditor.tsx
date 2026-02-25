@@ -1,7 +1,12 @@
 import { useEffect, useRef, useCallback } from "react";
 import { EditorView, keymap } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+} from "@codemirror/commands";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { GFM, Strikethrough, Table, TaskList } from "@lezer/markdown";
@@ -21,10 +26,12 @@ export default function MarkdownEditor({
   placeholder = "Start writing…",
 }: MarkdownEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const viewRef      = useRef<EditorView | null>(null);
+  const viewRef = useRef<EditorView | null>(null);
 
   const onChangeRef = useRef(onChange);
-  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -33,7 +40,7 @@ export default function MarkdownEditor({
       doc: initialValue,
       extensions: [
         history(),
-        keymap.of([...defaultKeymap, ...historyKeymap]),
+        keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]),
         markdown({
           base: markdownLanguage,
           codeLanguages: languages,
