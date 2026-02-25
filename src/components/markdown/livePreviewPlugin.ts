@@ -151,6 +151,14 @@ function buildDecorations(view: EditorView): DecorationSet {
         // ── Hide syntax marks when cursor is not on the same line ─────────
         if (SYNTAX_MARKS.has(node.name) && lineAway) {
           builder.add(node.from, node.to, hide);
+
+          // Also hide the space after HeaderMark (e.g. "## Title" → hide "## ")
+          if (node.name === "HeaderMark") {
+            const nextChar = view.state.doc.sliceString(node.to, node.to + 1);
+            if (nextChar === " ") {
+              builder.add(node.to, node.to + 1, hide);
+            }
+          }
         }
 
         // ── Images ────────────────────────────────────────────────────────
