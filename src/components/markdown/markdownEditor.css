@@ -1,27 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 @import url("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
-
-:root {
-  --md-bg: #0f0f10;
-  --md-surface: #18181b;
-  --md-border: #2a2a2f;
-  --md-text: #e4e4e7;
-  --md-text-muted: #71717a;
-  --md-text-faint: #3f3f46;
-  --md-accent: #a78bfa;
-  --md-accent-dim: #7c3aed33;
-  --md-gold: #fbbf24;
-  --md-cyan: #22d3ee;
-  --md-green: #4ade80;
-  --md-red: #f87171;
-
-  --md-font-body: "Lora", Georgia, serif;
-  --md-font-mono: "JetBrains Mono", "Fira Code", monospace;
-
-  --md-line-height: 1.75;
-  --md-content-width: 680px;
-  --md-padding: 2rem;
-}
 
 .md-editor-root {
   height: 100%;
@@ -49,7 +27,7 @@
 
 .md-editor-root .cm-editor {
   height: 100%;
-  font-family: var(--md-font-mono);
+  font-family: var(--md-font-body) !important;
   font-size: 1.1rem;
   line-height: var(--md-line-height);
   color: var(--md-text);
@@ -64,6 +42,7 @@
 
 .md-editor-root .cm-content {
   max-width: var(--md-content-width);
+  font-family: var(--md-font-body) !important;
   margin: 0 auto;
   caret-color: var(--md-accent);
   white-space: pre-wrap;
@@ -72,6 +51,7 @@
 
 .md-editor-root .cm-line {
   padding: 0;
+  font-family: var(--md-font-body) !important;
 }
 
 .md-editor-root .cm-cursor {
