@@ -28,7 +28,7 @@
 .md-editor-root .cm-editor {
   height: 100%;
   font-family: var(--md-font-body) !important;
-  font-size: 1.1rem;
+  font-size: 1rem;
   line-height: var(--md-line-height);
   color: var(--md-text);
   background: transparent;
@@ -93,23 +93,21 @@
 }
 .md-editor-root .md-h3 {
   font-family: var(--md-font-body);
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  color: var(--md-accent);
+  color: var(--md-text);
 }
 .md-editor-root .md-h4 {
   font-family: var(--md-font-body);
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  color: var(--md-accent);
+  color: var(--md-text);
 }
-.md-editor-root .md-h5,
-.md-editor-root .md-h6 {
-  font-size: 0.9rem;
+.md-editor-root .md-h5 {
+  font-family: var(--md-font-body);
+  font-size: 1.1rem;
   font-weight: 600;
-  color: var(--md-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  color: var(--md-text);
 }
 
 .md-editor-root .md-bold {
