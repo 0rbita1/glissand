@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 import { EditorView, keymap } from "@codemirror/view";
+import { indentUnit } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import {
   defaultKeymap,
@@ -41,6 +42,7 @@ export default function MarkdownEditor({
       doc: initialValue,
       extensions: [
         history(),
+        indentUnit.of("    "),
         keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]),
         markdown({
           base: markdownLanguage,
