@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
 
 :root {
   --md-bg: #0f0f10;
@@ -231,4 +232,54 @@
 }
 .md-editor-root .cm-scroller::-webkit-scrollbar-thumb:hover {
   background: var(--md-text-faint);
+}
+/* ...existing code... */
+
+.md-math-inline {
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--md-text);
+  cursor: default;
+}
+
+.md-math-block {
+  display: block;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  color: var(--md-text);
+  overflow-x: auto;
+  border-left: 2px solid var(--md-accent-dim);
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
+  background: var(--md-surface);
+}
+
+.md-math-block:hover {
+  border-left-color: var(--md-accent);
+  background: #1f1f23;
+}
+
+.md-math-block .katex-display {
+  margin: 0;
+}
+
+.md-math-block-empty {
+  color: var(--md-text-faint);
+  font-family: var(--md-font-mono);
+  font-size: 0.8rem;
+  font-style: italic;
+  text-align: left;
+  border-left: 2px solid var(--md-border);
+  background: transparent;
+}
+
+.md-math-error {
+  color: var(--md-red);
+  font-family: var(--md-font-mono);
+  font-size: 0.85rem;
+  background: #27272a;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  border: 1px solid var(--md-border);
 }
