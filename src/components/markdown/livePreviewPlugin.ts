@@ -163,12 +163,8 @@ function buildDecorations(view: EditorView): DecorationSet {
 
         // ── List marks ────────────────────────────────────────────────────
         if (node.name === "ListMark" && lineAway) {
+          builder.add(node.from, node.to, hide);
           builder.add(node.from, node.to, listItem);
-          // Hide the space after the list mark
-          const nextChar = view.state.doc.sliceString(node.to, node.to + 1);
-          if (nextChar === " ") {
-            builder.add(node.to, node.to, hide);
-          }
         }
 
         // ── Images ────────────────────────────────────────────────────────

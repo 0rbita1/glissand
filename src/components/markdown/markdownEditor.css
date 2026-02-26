@@ -274,4 +274,6 @@
 .md-list-item::before {
   content: "•";
   position: absolute;
+  color: var(--md-text-muted);
+  font-size: 1rem;
 }
