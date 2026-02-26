@@ -61,7 +61,6 @@ const SYNTAX_MARKS = new Set([
   "CodeMark",
   "LinkMark",
   "QuoteMark",
-  "ListMark",
   "TableDelimiter",
   "TaskMarker",
 ]);
@@ -121,6 +120,7 @@ class ImageWidget extends WidgetType {
 
 const tableRow = Decoration.mark({ class: "md-table-row" });
 const tableHead = Decoration.mark({ class: "md-table-head" });
+const listItem = Decoration.mark({ class: "md-list-item" });
 
 // ─── Main decoration builder ─────────────────────────────────────────────────
 
@@ -158,6 +158,16 @@ function buildDecorations(view: EditorView): DecorationSet {
             if (nextChar === " ") {
               builder.add(node.to, node.to + 1, hide);
             }
+          }
+        }
+
+        // ── List marks ────────────────────────────────────────────────────
+        if (node.name === "ListMark" && lineAway) {
+          builder.add(node.from, node.to, listItem);
+          // Hide the space after the list mark
+          const nextChar = view.state.doc.sliceString(node.to, node.to + 1);
+          if (nextChar === " ") {
+            builder.add(node.to, node.to, hide);
           }
         }
 

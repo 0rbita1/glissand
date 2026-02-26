@@ -211,7 +211,6 @@
 .md-editor-root .cm-scroller::-webkit-scrollbar-thumb:hover {
   background: var(--md-text-faint);
 }
-/* ...existing code... */
 
 .md-math-inline {
   display: inline-block;
@@ -260,4 +259,19 @@
   padding: 0.1em 0.35em;
   border-radius: 3px;
   border: 1px solid var(--md-border);
+}
+
+.md-list-item {
+  display: inline-block;
+  width: 1em;
+  text-align: center;
+  /* Or replace with a bullet character: */
+  /* visibility: hidden; */
+  /* position: relative; */
+}
+
+/* Optional: replace hyphen with bullet */
+.md-list-item::before {
+  content: "•";
+  position: absolute;
 }
