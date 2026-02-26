@@ -34,6 +34,7 @@ function cursorOnSameLine(from: number, to: number, view: EditorView): boolean {
 // ─── Decoration definitions (flyweight — defined once, reused everywhere) ───
 
 const hide = Decoration.mark({ class: "md-hide" });
+const hideText = Decoration.mark({ class: "md-hide-text" });
 
 const bold = Decoration.mark({ class: "md-bold" });
 const italic = Decoration.mark({ class: "md-italic" });
@@ -58,10 +59,8 @@ const SYNTAX_MARKS = new Set([
   "HeaderMark",
   "EmphasisMark",
   "StrikethroughMark",
-  "CodeMark",
   "LinkMark",
   "QuoteMark",
-  "ListMark",
   "TableDelimiter",
   "TaskMarker",
 ]);
@@ -121,6 +120,7 @@ class ImageWidget extends WidgetType {
 
 const tableRow = Decoration.mark({ class: "md-table-row" });
 const tableHead = Decoration.mark({ class: "md-table-head" });
+const listItem = Decoration.mark({ class: "md-list-item" });
 
 // ─── Main decoration builder ─────────────────────────────────────────────────
 
@@ -144,13 +144,91 @@ function buildDecorations(view: EditorView): DecorationSet {
 
         // ── Content-level styles (bold, italic, etc.) ─────────────────────
         const cDeco = CONTENT_STYLES[node.name];
-        if (cDeco && cursorAway) {
-          builder.add(node.from, node.to, cDeco);
+        if (cDeco) {
+          // Skip Emphasis if it's a direct child of StrongEmphasis to avoid double-styling
+          if (node.name === "Emphasis") {
+            const parent = node.node.parent;
+            if (parent?.name === "StrongEmphasis") return;
+          }
+
+          if (node.name === "Blockquote") {
+            builder.add(node.from, node.to, cDeco);
+          } else if (node.name === "HorizontalRule") {
+            builder.add(node.from, node.to, cDeco);
+            if (lineAway) {
+              builder.add(node.from, node.to, hideText);
+            }
+          } else if (lineAway) {
+            builder.add(node.from, node.to, cDeco);
+
+            // For InlineCode, hide the opening and closing backtick marks
+            if (node.name === "InlineCode") {
+              node.node.cursor().iterate((child) => {
+                if (child.name === "CodeMark") {
+                  builder.add(child.from, child.to, hide);
+                }
+              });
+            }
+
+            // For FencedCode, hide the opening and closing fence lines
+            if (node.name === "FencedCode") {
+              const firstLine = view.state.doc.lineAt(node.from);
+              const lastLine = view.state.doc.lineAt(node.to);
+
+              // Hide opening line (includes ``` and optional language tag)
+              if (!cursorOnSameLine(firstLine.from, firstLine.to, view)) {
+                builder.add(firstLine.from, firstLine.to, hide);
+              }
+
+              // Hide closing line (the closing ```)
+              if (!cursorOnSameLine(lastLine.from, lastLine.to, view)) {
+                builder.add(lastLine.from, lastLine.to, hide);
+              }
+            }
+          }
         }
 
         // ── Hide syntax marks when cursor is not on the same line ─────────
         if (SYNTAX_MARKS.has(node.name) && lineAway) {
-          builder.add(node.from, node.to, hide);
+          // TaskMarker is handled separately below
+          if (node.name !== "TaskMarker") {
+            builder.add(node.from, node.to, hide);
+          }
+
+          // Also hide the space after HeaderMark (e.g. "## Title" → hide "## ")
+          if (node.name === "HeaderMark") {
+            const nextChar = view.state.doc.sliceString(node.to, node.to + 1);
+            if (nextChar === " ") {
+              builder.add(node.to, node.to + 1, hide);
+            }
+          }
+        }
+
+        // ── Task list checkboxes ──────────────────────────────────────────
+        if (node.name === "TaskMarker") {
+          const markerText = view.state.doc.sliceString(node.from, node.to);
+          const checked = markerText === "[x]" || markerText === "[X]";
+          if (lineAway) {
+            builder.add(
+              node.from,
+              node.to,
+              Decoration.replace({
+                widget: new CheckboxWidget(checked, node.from),
+              }),
+            );
+          }
+        }
+
+        // ── List marks ────────────────────────────────────────────────────
+        if (node.name === "ListMark" && lineAway) {
+          // Don't hide list mark if this line has a TaskMarker (checkbox handles it)
+          const line = view.state.doc.lineAt(node.from);
+          const lineText = view.state.doc.sliceString(line.from, line.to);
+          const isTaskItem = /^(\s*[-*+])\s+\[[ xX]\]/.test(lineText);
+          if (!isTaskItem) {
+            builder.add(node.from, node.to, hide);
+            builder.add(node.from, node.to, listItem);
+          }
         }
 
         // ── Images ────────────────────────────────────────────────────────
@@ -206,3 +284,38 @@ export const livePreviewPlugin = ViewPlugin.fromClass(
   },
   { decorations: (v) => v.decorations },
 );
+
+// ─── Checkbox Widget ─────────────────────────────────────────────────────────
+
+class CheckboxWidget extends WidgetType {
+  constructor(
+    readonly checked: boolean,
+    readonly from: number,
+  ) {
+    super();
+  }
+
+  eq(other: CheckboxWidget) {
+    return other.checked === this.checked;
+  }
+
+  toDOM(view: EditorView) {
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = this.checked;
+    checkbox.className = "md-task-checkbox";
+    checkbox.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      const marker = view.state.doc.sliceString(this.from, this.from + 3);
+      const newMarker = marker === "[ ]" ? "[x]" : "[ ]";
+      view.dispatch({
+        changes: { from: this.from, to: this.from + 3, insert: newMarker },
+      });
+    });
+    return checkbox;
+  }
+
+  ignoreEvent() {
+    return false;
+  }
+}
