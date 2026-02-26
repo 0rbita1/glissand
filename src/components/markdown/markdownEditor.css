@@ -141,22 +141,16 @@
 }
 
 .md-editor-root .md-blockquote {
-  display: flex;
-  align-items: center;
-  padding-left: 0;
   color: var(--md-text);
+  font-style: italic;
   font-family: var(--md-font-body);
-  border: none;
+  border-left: 2px solid var(--md-accent);
+  padding-left: 0.75em;
+  display: block;
 }
+
 .md-editor-root .md-blockquote::before {
-  content: "";
-  display: inline-block;
-  height: 1em;
-  min-height: 1em;
-  width: 3px;
-  background: var(--md-accent);
-  margin-right: 0.5em;
-  border-radius: 2px;
+  display: none;
 }
 
 .md-editor-root .md-codeblock {
