@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400;1,500&display=swap");
 @import url("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
 
 .md-editor-root {
@@ -286,4 +286,13 @@
   position: absolute;
   color: var(--md-text-muted);
   font-size: 1rem;
+}
+
+.md-task-checkbox {
+  width: 0.85em;
+  height: 0.85em;
+  margin-right: 0.4em;
+  vertical-align: middle;
+  accent-color: var(--md-accent);
+  cursor: pointer;
 }
