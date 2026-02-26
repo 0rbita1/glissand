@@ -1,27 +1,29 @@
 import { useState } from "react";
 import "./App.css";
+import "./components/markdown/markdownEditor.css";
 import StatisticsBar from "./statisticsBar";
 import Titlebar from "./titlebar";
+import MarkdownEditor from "./components/markdown/markdownEditor";
 
 function App() {
   const [text, setText] = useState("");
   const [lastModified, setLastModified] = useState<Date | null>(null);
 
-  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    setText(e.target.value);
+  function handleChange(value: string) {
+    setText(value);
     setLastModified(new Date());
   }
 
   return (
     <>
       <Titlebar />
-      <textarea
-        className="textArea"
-        value={text}
-        onChange={handleChange}
-        placeholder="Type here..."
-        autoFocus
-      />
+      <div className="editorContainer">
+        <MarkdownEditor
+          initialValue={text}
+          onChange={handleChange}
+          placeholder="Type here..."
+        />
+      </div>
       <StatisticsBar text={text} lastModified={lastModified} />
     </>
   );

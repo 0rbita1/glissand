@@ -1,0 +1,298 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400;1,500&display=swap");
+@import url("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+
+.md-editor-root {
+  height: 100%;
+  width: 100%;
+  background: var(--md-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.md-editor-root[data-placeholder]::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  top: var(--md-padding);
+  left: var(--md-padding);
+  color: var(--md-text-faint);
+  font-family: var(--md-font-body);
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 1;
+}
+.md-editor-root:has(.cm-content:not(:empty))::before {
+  display: none;
+}
+
+.md-editor-root .cm-editor {
+  height: 100%;
+  font-family: var(--md-font-body) !important;
+  font-size: 1rem;
+  line-height: var(--md-line-height);
+  color: var(--md-text);
+  background: transparent;
+}
+
+.md-editor-root .cm-scroller {
+  overflow: auto;
+  padding: var(--md-padding);
+  padding-right: calc(var(--md-padding) + 6px);
+}
+
+.md-editor-root .cm-content {
+  max-width: var(--md-content-width);
+  font-family: var(--md-font-body) !important;
+  margin: 0 auto;
+  caret-color: var(--md-accent);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.md-editor-root .cm-line {
+  padding: 0;
+  font-family: var(--md-font-body) !important;
+}
+
+.md-editor-root .cm-cursor {
+  border-left: 2px solid var(--md-accent);
+}
+
+.md-editor-root .cm-selectionBackground {
+  background: var(--md-accent-dim) !important;
+}
+.md-editor-root.cm-focused .cm-selectionBackground {
+  background: var(--md-accent-dim) !important;
+}
+
+.md-editor-root .cm-editor.cm-focused {
+  outline: none;
+}
+
+.md-editor-root .md-hide {
+  font-size: 0;
+  color: transparent;
+  width: 0;
+  display: inline-block;
+}
+
+.md-editor-root .md-hide-text {
+  color: transparent;
+  font-size: 0;
+  caret-color: var(--md-text);
+}
+
+.md-editor-root .md-h1 {
+  font-family: var(--md-font-body);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--md-text);
+  line-height: 1.3;
+  display: block;
+}
+.md-editor-root .md-h2 {
+  font-family: var(--md-font-body);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--md-text);
+  line-height: 1.3;
+}
+.md-editor-root .md-h3 {
+  font-family: var(--md-font-body);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--md-text);
+}
+.md-editor-root .md-h4 {
+  font-family: var(--md-font-body);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--md-text);
+}
+.md-editor-root .md-h5 {
+  font-family: var(--md-font-body);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--md-text);
+}
+
+.md-editor-root .md-bold {
+  font-weight: 700;
+  color: var(--md-text);
+  font-family: var(--md-font-body);
+}
+.md-editor-root .md-italic {
+  font-style: italic;
+  font-family: var(--md-font-body);
+  color: var(--md-text);
+}
+.md-editor-root .md-strike {
+  text-decoration: line-through;
+  color: var(--md-text-muted);
+}
+.md-editor-root .md-code {
+  font-family: var(--md-font-mono);
+  font-size: 0.85em;
+  background: #242424;
+  color: var(--md-text);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--md-border);
+}
+.md-editor-root .md-link {
+  color: var(--md-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--md-accent-dim);
+}
+
+.md-editor-root .md-blockquote {
+  color: var(--md-text);
+  font-style: italic;
+  font-family: var(--md-font-body);
+  border-left: 2px solid var(--md-accent);
+  padding-left: 0.75em;
+  display: block;
+}
+
+.md-editor-root .md-blockquote::before {
+  display: none;
+}
+
+.md-editor-root .md-codeblock {
+  font-family: var(--md-font-mono);
+  font-size: 0.85rem;
+  background: #242424;
+  color: var(--md-text);
+  display: block;
+  padding: 0.25em 0.75em;
+}
+
+.md-editor-root .md-hr {
+  display: block;
+  border: none;
+  border-top: 1px solid #363636;
+  color: var(--md-text-faint);
+  padding-bottom: 1rem;
+}
+
+.md-editor-root .md-table-head {
+  font-weight: 700;
+  color: var(--md-gold);
+  border-bottom: 1px solid var(--md-border);
+}
+.md-editor-root .md-table-row {
+  color: var(--md-text);
+}
+
+.md-image-widget {
+  display: block;
+  margin: 0.75rem 0;
+}
+.md-image {
+  display: block;
+  max-width: 100%;
+  max-height: 480px;
+  border-radius: 6px;
+  border: 1px solid var(--md-border);
+  object-fit: contain;
+}
+.md-image-error {
+  display: inline-block;
+  color: var(--md-red);
+  font-family: var(--md-font-mono);
+  font-size: 0.8rem;
+  background: #27272a;
+  padding: 0.25em 0.5em;
+  border-radius: 4px;
+  border: 1px solid var(--md-border);
+}
+
+.md-editor-root .cm-scroller::-webkit-scrollbar {
+  width: 6px;
+}
+.md-editor-root .cm-scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+.md-editor-root .cm-scroller::-webkit-scrollbar-thumb {
+  background: var(--md-border);
+  border-radius: 3px;
+}
+.md-editor-root .cm-scroller::-webkit-scrollbar-thumb:hover {
+  background: var(--md-text-faint);
+}
+
+.md-math-inline {
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--md-text);
+  cursor: default;
+}
+
+.md-math-block {
+  display: block;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  color: var(--md-text);
+  overflow-x: auto;
+  border-left: 2px solid var(--md-accent-dim);
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
+  background: var(--md-surface);
+}
+
+.md-math-block:hover {
+  border-left-color: var(--md-accent);
+  background: #1f1f23;
+}
+
+.md-math-block .katex-display {
+  margin: 0;
+}
+
+.md-math-block-empty {
+  color: var(--md-text-faint);
+  font-family: var(--md-font-mono);
+  font-size: 0.8rem;
+  font-style: italic;
+  text-align: left;
+  border-left: 2px solid var(--md-border);
+  background: transparent;
+}
+
+.md-math-error {
+  color: var(--md-red);
+  font-family: var(--md-font-mono);
+  font-size: 0.85rem;
+  background: #27272a;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  border: 1px solid var(--md-border);
+}
+
+.md-list-item {
+  display: inline-block;
+  width: 1em;
+  text-align: center;
+  /* Or replace with a bullet character: */
+  /* visibility: hidden; */
+  /* position: relative; */
+}
+
+/* Optional: replace hyphen with bullet */
+.md-list-item::before {
+  content: "•";
+  position: absolute;
+  color: var(--md-text-muted);
+  font-size: 1rem;
+}
+
+.md-task-checkbox {
+  width: 0.85em;
+  height: 0.85em;
+  margin-right: 0.4em;
+  vertical-align: middle;
+  accent-color: var(--md-accent);
+  cursor: pointer;
+}

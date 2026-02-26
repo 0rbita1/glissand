@@ -1,7 +1,7 @@
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Inter", Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
-  line-height: 24px;
+  line-height: 1.75;
   font-weight: 400;
 
   color: #dadada;
@@ -12,6 +12,27 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  /* markdown editor tokens — kept here to avoid :root duplication */
+  --md-bg: #0f0f10;
+  --md-surface: #18181b;
+  --md-border: #2a2a2f;
+  --md-text: #e4e4e7;
+  --md-text-muted: #71717a;
+  --md-text-faint: #3f3f46;
+  --md-accent: #2095cf;
+  --md-accent-dim: #7c3aed33;
+  --md-gold: #fbbf24;
+  --md-cyan: #22d3ee;
+  --md-green: #4ade80;
+  --md-red: #f87171;
+
+  --md-font-body: "Inter", Avenir, Helvetica, Arial, sans-serif;
+  --md-font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  --md-line-height: 1.75;
+  --md-content-width: 680px;
+  --md-padding: 2rem;
 }
 
 /* Prevent body-level overflow */
@@ -25,9 +46,10 @@ body,
   width: 100%;
 }
 
+/*
 .textArea {
   width: 100vw;
-  height: calc(100vh - 32px); /* Subtract titlebar height */
+  height: calc(100vh - 32px); 
   box-sizing: border-box;
   border: none;
   outline: none;
@@ -38,7 +60,16 @@ body,
   background: #1e1e1e;
   color: #dadada;
   font-family: inherit;
-  overflow: hidden; /* Hide scrollbar but keep scroll functionality */
+  overflow: hidden; 
+}
+*/
+
+.editorContainer {
+  position: fixed;
+  top: 32px;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .statisticsBar {
