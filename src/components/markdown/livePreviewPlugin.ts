@@ -58,7 +58,6 @@ const SYNTAX_MARKS = new Set([
   "HeaderMark",
   "EmphasisMark",
   "StrikethroughMark",
-  "CodeMark",
   "LinkMark",
   "QuoteMark",
   "TableDelimiter",
@@ -144,8 +143,17 @@ function buildDecorations(view: EditorView): DecorationSet {
 
         // ── Content-level styles (bold, italic, etc.) ─────────────────────
         const cDeco = CONTENT_STYLES[node.name];
-        if (cDeco && cursorAway) {
+        if (cDeco && lineAway) {
           builder.add(node.from, node.to, cDeco);
+
+          // For InlineCode, hide the opening and closing backtick marks
+          if (node.name === "InlineCode") {
+            node.node.cursor().iterate((child) => {
+              if (child.name === "CodeMark") {
+                builder.add(child.from, child.to, hide);
+              }
+            });
+          }
         }
 
         // ── Hide syntax marks when cursor is not on the same line ─────────

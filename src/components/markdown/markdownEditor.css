@@ -127,8 +127,8 @@
 .md-editor-root .md-code {
   font-family: var(--md-font-mono);
   font-size: 0.85em;
-  background: #27272a;
-  color: var(--md-cyan);
+  background: #242424;
+  color: var(--md-text);
   border-radius: 3px;
   padding: 0.1em 0.35em;
   border: 1px solid var(--md-border);
@@ -151,11 +151,9 @@
 .md-editor-root .md-codeblock {
   font-family: var(--md-font-mono);
   font-size: 0.85rem;
-  background: #1c1c1f;
-  color: var(--md-green);
+  background: #242424;
+  color: var(--md-text);
   display: block;
-  border-radius: 6px;
-  border: 1px solid var(--md-border);
   padding: 0.25em 0.75em;
 }
 
