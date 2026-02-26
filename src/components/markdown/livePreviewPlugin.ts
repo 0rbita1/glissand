@@ -34,6 +34,7 @@ function cursorOnSameLine(from: number, to: number, view: EditorView): boolean {
 // ─── Decoration definitions (flyweight — defined once, reused everywhere) ───
 
 const hide = Decoration.mark({ class: "md-hide" });
+const hideText = Decoration.mark({ class: "md-hide-text" });
 
 const bold = Decoration.mark({ class: "md-bold" });
 const italic = Decoration.mark({ class: "md-italic" });
@@ -146,6 +147,11 @@ function buildDecorations(view: EditorView): DecorationSet {
         if (cDeco) {
           if (node.name === "Blockquote") {
             builder.add(node.from, node.to, cDeco);
+          } else if (node.name === "HorizontalRule") {
+            builder.add(node.from, node.to, cDeco);
+            if (lineAway) {
+              builder.add(node.from, node.to, hideText);
+            }
           } else if (lineAway) {
             builder.add(node.from, node.to, cDeco);
 

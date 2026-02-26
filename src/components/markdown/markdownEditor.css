@@ -76,6 +76,12 @@
   display: inline-block;
 }
 
+.md-editor-root .md-hide-text {
+  color: transparent;
+  font-size: 0;
+  caret-color: var(--md-text);
+}
+
 .md-editor-root .md-h1 {
   font-family: var(--md-font-body);
   font-size: 2rem;
@@ -165,8 +171,9 @@
 .md-editor-root .md-hr {
   display: block;
   border: none;
-  border-top: 1px solid var(--md-border);
+  border-top: 1px solid #363636;
   color: var(--md-text-faint);
+  padding-bottom: 1rem;
 }
 
 .md-editor-root .md-table-head {
