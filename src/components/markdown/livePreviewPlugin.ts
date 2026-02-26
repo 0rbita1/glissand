@@ -143,16 +143,21 @@ function buildDecorations(view: EditorView): DecorationSet {
 
         // ── Content-level styles (bold, italic, etc.) ─────────────────────
         const cDeco = CONTENT_STYLES[node.name];
-        if (cDeco && lineAway) {
-          builder.add(node.from, node.to, cDeco);
+        if (cDeco) {
+          // Blockquote bar should always be visible; other styles only when cursor is away
+          if (node.name === "Blockquote") {
+            builder.add(node.from, node.to, cDeco);
+          } else if (lineAway) {
+            builder.add(node.from, node.to, cDeco);
 
-          // For InlineCode, hide the opening and closing backtick marks
-          if (node.name === "InlineCode") {
-            node.node.cursor().iterate((child) => {
-              if (child.name === "CodeMark") {
-                builder.add(child.from, child.to, hide);
-              }
-            });
+            // For InlineCode, hide the opening and closing backtick marks
+            if (node.name === "InlineCode") {
+              node.node.cursor().iterate((child) => {
+                if (child.name === "CodeMark") {
+                  builder.add(child.from, child.to, hide);
+                }
+              });
+            }
           }
         }
 

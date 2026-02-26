@@ -141,11 +141,22 @@
 }
 
 .md-editor-root .md-blockquote {
-  border-left: 3px solid var(--md-accent);
-  padding-left: 1em;
-  color: var(--md-text-muted);
-  font-style: italic;
+  display: flex;
+  align-items: center;
+  padding-left: 0;
+  color: var(--md-text);
   font-family: var(--md-font-body);
+  border: none;
+}
+.md-editor-root .md-blockquote::before {
+  content: "";
+  display: inline-block;
+  height: 1em;
+  min-height: 1em;
+  width: 3px;
+  background: var(--md-accent);
+  margin-right: 0.5em;
+  border-radius: 2px;
 }
 
 .md-editor-root .md-codeblock {
