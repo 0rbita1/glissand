@@ -144,7 +144,6 @@ function buildDecorations(view: EditorView): DecorationSet {
         // ── Content-level styles (bold, italic, etc.) ─────────────────────
         const cDeco = CONTENT_STYLES[node.name];
         if (cDeco) {
-          // Blockquote bar should always be visible; other styles only when cursor is away
           if (node.name === "Blockquote") {
             builder.add(node.from, node.to, cDeco);
           } else if (lineAway) {
@@ -157,6 +156,22 @@ function buildDecorations(view: EditorView): DecorationSet {
                   builder.add(child.from, child.to, hide);
                 }
               });
+            }
+
+            // For FencedCode, hide the opening and closing fence lines
+            if (node.name === "FencedCode") {
+              const firstLine = view.state.doc.lineAt(node.from);
+              const lastLine = view.state.doc.lineAt(node.to);
+
+              // Hide opening line (includes ``` and optional language tag)
+              if (!cursorOnSameLine(firstLine.from, firstLine.to, view)) {
+                builder.add(firstLine.from, firstLine.to, hide);
+              }
+
+              // Hide closing line (the closing ```)
+              if (!cursorOnSameLine(lastLine.from, lastLine.to, view)) {
+                builder.add(lastLine.from, lastLine.to, hide);
+              }
             }
           }
         }
