@@ -1,8 +1,8 @@
 import { useState } from "react";
-import "./App.css";
+import "./styles/App.css";
 import "./components/markdown/markdownEditor.css";
-import StatisticsBar from "./statisticsBar";
-import Titlebar from "./titlebar";
+import StatisticsBar from "./components/statisticsBar";
+import Titlebar from "./components/titlebar";
 import MarkdownEditor from "./components/markdown/markdownEditor";
 
 function App() {
