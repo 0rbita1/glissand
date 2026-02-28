@@ -1,7 +1,4 @@
-type StatisticsBarProps = {
-  text: string;
-  lastModified: Date | null;
-};
+import { StatisticsBarProps } from "../types/components.types";
 
 function StatisticsBar({ text, lastModified }: StatisticsBarProps) {
   const wordCount = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
