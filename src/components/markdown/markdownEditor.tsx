@@ -10,9 +10,14 @@ import {
 } from "@codemirror/commands";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
+import {
+  defaultHighlightStyle,
+  syntaxHighlighting,
+} from "@codemirror/language";
 import { GFM, Strikethrough, Table, TaskList } from "@lezer/markdown";
 import { livePreviewPlugin } from "./livePreviewPlugin";
 import { mathPlugin } from "./mathPlugin";
+import markdownCodeHighlight from "./markdownCodeHighlight";
 
 interface MarkdownEditorProps {
   initialValue?: string;
@@ -49,6 +54,8 @@ export default function MarkdownEditor({
           codeLanguages: languages,
           extensions: [GFM, Strikethrough, Table, TaskList],
         }),
+        syntaxHighlighting(markdownCodeHighlight),
+        syntaxHighlighting(defaultHighlightStyle),
         livePreviewPlugin,
         mathPlugin,
         EditorView.updateListener.of((update) => {
