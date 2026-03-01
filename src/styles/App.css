@@ -46,24 +46,6 @@ body,
   width: 100%;
 }
 
-/*
-.textArea {
-  width: 100vw;
-  height: calc(100vh - 32px); 
-  box-sizing: border-box;
-  border: none;
-  outline: none;
-  resize: none;
-  font-size: 1.1em;
-  padding: 1em;
-  padding-top: 2em;
-  background: #1e1e1e;
-  color: #dadada;
-  font-family: inherit;
-  overflow: hidden; 
-}
-*/
-
 .editorContainer {
   position: fixed;
   top: 32px;
@@ -83,8 +65,40 @@ body,
   font-size: 0.8em;
   color: #dadada;
   font-family: inherit;
-  background-color: #262626;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.01)
+  );
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   pointer-events: none;
+}
+
+.hotBar {
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.01)
+  );
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  min-width: 320px;
+  max-width: 80%;
+  height: 44px;
+  z-index: 900;
+  pointer-events: auto;
+  color: #dadada;
+  user-select: none;
 }
 
 .titlebar {

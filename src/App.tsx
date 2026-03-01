@@ -7,6 +7,7 @@ import MarkdownEditor from "./components/markdown/markdownEditor";
 import { readNote } from "./services/fileService";
 import { useAutoSave } from "./hooks/useAutoSave";
 import type { NoteLoadState } from "./types/note.types";
+import HotBar from "./components/hotbar";
 
 function App() {
   const [text, setText] = useState("");
@@ -55,6 +56,7 @@ function App() {
           />
         )}
       </div>
+      <HotBar />
       <StatisticsBar text={text} lastModified={lastModified} />
     </>
   );
