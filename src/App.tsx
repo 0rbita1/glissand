@@ -7,7 +7,7 @@ import MarkdownEditor from "./components/markdown/markdownEditor";
 import { readNote } from "./services/fileService";
 import { useAutoSave } from "./hooks/useAutoSave";
 import type { NoteLoadState } from "./types/note.types";
-import HotBar from "./components/hotbar";
+import HotBar from "./components/hotBar";
 
 function App() {
   const [text, setText] = useState("");
