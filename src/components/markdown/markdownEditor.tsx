@@ -12,7 +12,7 @@ import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { GFM, Strikethrough, Table, TaskList } from "@lezer/markdown";
 import { livePreviewPlugin } from "./livePreviewPlugin";
-import { mathPlugin } from "./mathPlugin";
+import { mathField } from "./mathPlugin";
 
 interface MarkdownEditorProps {
   initialValue?: string;
@@ -50,7 +50,7 @@ export default function MarkdownEditor({
           extensions: [GFM, Strikethrough, Table, TaskList],
         }),
         livePreviewPlugin,
-        mathPlugin,
+        mathField,
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onChangeRef.current?.(update.state.doc.toString());
