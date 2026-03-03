@@ -18,9 +18,9 @@ const hotBarButtons = [
   { id: "cmd-palette", icon: Command, label: "Command Palette" },
 ] as const;
 
-function HotBar() {
+function HotBar({ className = "" }: { className?: string }) {
   return (
-    <div className="hotBar">
+    <div className={`hotBar ${className}`}>
       {hotBarButtons.map(({ id, icon: Icon, label }) => (
         <button
           key={id}

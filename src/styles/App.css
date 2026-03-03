@@ -75,6 +75,13 @@ body,
   backdrop-filter: blur(8px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.statisticsBar.ui-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .hotBar {
@@ -101,6 +108,13 @@ body,
   pointer-events: auto;
   color: #dadada;
   user-select: none;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.hotBar.ui-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .hotBar-btn {
