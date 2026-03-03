@@ -6,16 +6,17 @@ import Titlebar from "./components/titlebar";
 import MarkdownEditor from "./components/markdown/markdownEditor";
 import { readNote } from "./services/fileService";
 import { useAutoSave } from "./hooks/useAutoSave";
+import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
+import HotBar from "./components/hotBar";
 
 function App() {
   const [text, setText] = useState("");
   const [lastModified, setLastModified] = useState<Date | null>(null);
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
-  // isDirty is true only after the user has made their first edit.
-  // This prevents useAutoSave from firing before (or instead of) the
-  // initial load, which would overwrite the saved note with an empty string.
   const [isDirty, setIsDirty] = useState(false);
+
+  const uiVisible = useAutoHideUI();
 
   // Load the persisted note once on mount.
   useEffect(() => {
@@ -44,9 +45,6 @@ function App() {
     <>
       <Titlebar />
       <div className="editorContainer">
-        {/* Defer mounting until content is loaded so MarkdownEditor
-            receives the correct initialValue on its first render.
-            The editor only reads initialValue once (on mount). */}
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
             initialValue={text}
@@ -55,7 +53,12 @@ function App() {
           />
         )}
       </div>
-      <StatisticsBar text={text} lastModified={lastModified} />
+      <HotBar className={uiVisible ? "" : "ui-hidden"} />
+      <StatisticsBar
+        text={text}
+        lastModified={lastModified}
+        className={uiVisible ? "" : "ui-hidden"}
+      />
     </>
   );
 }

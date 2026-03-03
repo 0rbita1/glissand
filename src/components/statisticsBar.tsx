@@ -1,6 +1,10 @@
 import { StatisticsBarProps } from "../types/components.types";
 
-function StatisticsBar({ text, lastModified }: StatisticsBarProps) {
+function StatisticsBar({
+  text,
+  lastModified,
+  className = "",
+}: StatisticsBarProps & { className?: string }) {
   const wordCount = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
   const characterCount = text.length;
   const modifiedTime = lastModified
@@ -8,7 +12,7 @@ function StatisticsBar({ text, lastModified }: StatisticsBarProps) {
     : "Never";
 
   return (
-    <div className="statisticsBar">
+    <div className={`statisticsBar ${className}`}>
       <span>Words: {wordCount}</span>
       <span>Characters: {characterCount}</span>
       <span>Last modified: {modifiedTime}</span>

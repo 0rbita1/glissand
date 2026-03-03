@@ -58,7 +58,7 @@ export default function MarkdownEditor({
         }),
         EditorView.theme({
           "&": { height: "100%", outline: "none" },
-          ".cm-scroller": { overflow: "auto" },
+          ".cm-scroller": { "overflow-x": "hidden", "overflow-y": "auto" },
         }),
       ],
     });

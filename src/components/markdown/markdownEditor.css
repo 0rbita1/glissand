@@ -35,18 +35,23 @@
 }
 
 .md-editor-root .cm-scroller {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--md-padding);
   padding-right: calc(var(--md-padding) + 6px);
 }
 
 .md-editor-root .cm-content {
+  width: 100%;
   max-width: var(--md-content-width);
+  min-width: 0;
+  box-sizing: border-box;
   font-family: var(--md-font-body) !important;
   margin: 0 auto;
   caret-color: var(--md-accent);
   white-space: pre-wrap;
   word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .md-editor-root .cm-line {
