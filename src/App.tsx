@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./styles/App.css";
 import "./components/markdown/markdownEditor.css";
 import StatisticsBar from "./components/statisticsBar";
@@ -9,16 +9,18 @@ import { useAutoSave } from "./hooks/useAutoSave";
 import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
 import HotBar from "./components/hotBar";
+import Title from "./components/title";
 
 function App() {
   const [text, setText] = useState("");
   const [lastModified, setLastModified] = useState<Date | null>(null);
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
   const [isDirty, setIsDirty] = useState(false);
+  const [title, setTitle] = useState("");
+  const editorRef = useRef(null);
 
   const uiVisible = useAutoHideUI();
 
-  // Load the persisted note once on mount.
   useEffect(() => {
     setLoadState("loading");
     readNote()
@@ -32,7 +34,6 @@ function App() {
       });
   }, []);
 
-  // Auto-save 500 ms after the user stops typing.
   useAutoSave(text, isDirty);
 
   function handleChange(value: string) {
@@ -41,15 +42,33 @@ function App() {
     setIsDirty(true);
   }
 
+  function handleTitleChange(value: string) {
+    setTitle(value);
+  }
+
   return (
     <>
       <Titlebar />
+      <div className="titleArea">
+        <Title
+          value={title}
+          onChange={handleTitleChange}
+          onEnter={() => editorRef.current?.focus()}
+        />
+      </div>
       <div className="editorContainer">
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
             initialValue={text}
             onChange={handleChange}
             placeholder="Type here…"
+            titleSlot={
+              <Title
+                value={title}
+                onChange={setTitle}
+                onEnter={() => editorRef.current?.focus()}
+              />
+            }
           />
         )}
       </div>

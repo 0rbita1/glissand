@@ -19,6 +19,7 @@ interface MarkdownEditorProps {
   onChange?: (markdown: string) => void;
   className?: string;
   placeholder?: string;
+  titleSlot?: React.ReactNode;
 }
 
 export default function MarkdownEditor({
@@ -26,6 +27,7 @@ export default function MarkdownEditor({
   onChange,
   className = "",
   placeholder = "Start writing…",
+  titleSlot,
 }: MarkdownEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -90,11 +92,14 @@ export default function MarkdownEditor({
   }, [setContent]);
 
   return (
-    <div
-      ref={containerRef}
-      className={`md-editor-root ${className}`}
-      data-placeholder={placeholder}
-      aria-label="Markdown editor"
-    />
+    <div className="md-editor-root">
+      {titleSlot && <div className="md-title-slot">{titleSlot}</div>}
+      <div
+        ref={containerRef}
+        className={`md-editor-root ${className}`}
+        data-placeholder={placeholder}
+        aria-label="Markdown editor"
+      />
+    </div>
   );
 }
