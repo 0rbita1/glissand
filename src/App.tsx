@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import "./styles/App.css";
-import "./components/markdown/markdownEditor.css";
+import "./styles/markdownEditor.css";
 import StatisticsBar from "./components/statisticsBar";
 import Titlebar from "./components/titlebar";
 import MarkdownEditor from "./components/markdown/markdownEditor";
