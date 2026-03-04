@@ -1,0 +1,19 @@
+.title-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--md-text);
+  font-family: var(--md-font-body);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 0;
+  caret-color: var(--md-accent);
+}
+
+.title-input::placeholder {
+  color: var(--md-text-faint);
+}

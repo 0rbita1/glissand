@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import "../styles/titleBar.css";
 
 const appWindow = getCurrentWindow();
 

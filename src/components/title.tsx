@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import "../styles/App.css";
+import "../styles/title.css";
 
 interface TitleProps {
   value: string;

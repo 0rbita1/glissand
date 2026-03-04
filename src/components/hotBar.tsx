@@ -7,6 +7,7 @@ import {
   SunMoon,
   Command,
 } from "lucide-react";
+import "../styles/hotBar.css";
 
 const hotBarButtons = [
   { id: "new-note", icon: FilePlus, label: "New Note" },
