@@ -21,6 +21,7 @@ function App() {
 
   const uiVisible = useAutoHideUI();
 
+  // Load the persisted note once on mount.
   useEffect(() => {
     setLoadState("loading");
     readNote()
@@ -34,6 +35,7 @@ function App() {
       });
   }, []);
 
+  // Auto-save 500 ms after the user stops typing.
   useAutoSave(text, isDirty);
 
   function handleChange(value: string) {
@@ -49,26 +51,13 @@ function App() {
   return (
     <>
       <Titlebar />
-      <div className="titleArea">
-        <Title
-          value={title}
-          onChange={handleTitleChange}
-          onEnter={() => editorRef.current?.focus()}
-        />
-      </div>
+      <div className="titleArea"></div>
       <div className="editorContainer">
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
             initialValue={text}
             onChange={handleChange}
             placeholder="Type here…"
-            titleSlot={
-              <Title
-                value={title}
-                onChange={setTitle}
-                onEnter={() => editorRef.current?.focus()}
-              />
-            }
           />
         )}
       </div>
