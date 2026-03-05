@@ -1,22 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import "../styles/titleBar.css";
 
-const appWindow = getCurrentWindow();
-
 function Titlebar() {
   const [alwaysOnTop, setAlwaysOnTop] = useState(false);
+  const appWindowRef = useRef<Awaited<ReturnType<typeof getCurrentWindow>> | null>(null);
 
   useEffect(() => {
-    appWindow.isAlwaysOnTop().then(setAlwaysOnTop);
+    const win = getCurrentWindow();
+    appWindowRef.current = win;
+    win.isAlwaysOnTop().then(setAlwaysOnTop);
   }, []);
 
-  const handleMinimize = () => appWindow.minimize();
-  const handleMaximize = () => appWindow.toggleMaximize();
-  const handleClose = () => appWindow.close();
+  const handleMinimize = () => appWindowRef.current?.minimize();
+  const handleMaximize = () => appWindowRef.current?.toggleMaximize();
+  const handleClose = () => appWindowRef.current?.close();
   const handleToggleAlwaysOnTop = async () => {
     const next = !alwaysOnTop;
-    await appWindow.setAlwaysOnTop(next);
+    await appWindowRef.current?.setAlwaysOnTop(next);
     setAlwaysOnTop(next);
   };
 
