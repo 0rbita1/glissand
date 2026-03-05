@@ -1,7 +1,7 @@
 import { Decoration, DecorationSet, EditorView } from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
-import { cursorOnSameLine, cursorOverlaps } from "../../utils/cursorHelpers";
+import { cursorOnSameLine } from "../../utils/cursorHelpers";
 import { ImageWidget } from "../widgets/ImageWidget";
 import { CheckboxWidget } from "../widgets/CheckboxWidget";
 import {
@@ -105,10 +105,14 @@ export function buildDecorations(view: EditorView): DecorationSet {
           const line = view.state.doc.lineAt(node.from);
           const lineText = view.state.doc.sliceString(line.from, line.to);
           const isTaskItem = /^(\s*[-*+])\s+\[[ xX]\]/.test(lineText);
-          if (!isTaskItem) {
+          const markText = view.state.doc.sliceString(node.from, node.to).trim();
+          const isOrdered = /^\d+[.)]$/.test(markText);
+
+          if (!isTaskItem && !isOrdered) {
             builder.add(node.from, node.to, hide);
             builder.add(node.from, node.to, listItem);
           }
+          // Ordered marks (e.g. "1.", "2)") — leave visible, render naturally
         }
 
         // ── Images ────────────────────────────────────────────────────────

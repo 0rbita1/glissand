@@ -4,7 +4,9 @@ import "../styles/titleBar.css";
 
 function Titlebar() {
   const [alwaysOnTop, setAlwaysOnTop] = useState(false);
-  const appWindowRef = useRef<Awaited<ReturnType<typeof getCurrentWindow>> | null>(null);
+  const appWindowRef = useRef<Awaited<
+    ReturnType<typeof getCurrentWindow>
+  > | null>(null);
 
   useEffect(() => {
     const win = getCurrentWindow();

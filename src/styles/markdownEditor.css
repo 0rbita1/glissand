@@ -280,16 +280,14 @@
   display: inline-block;
   width: 1em;
   text-align: center;
-  /* Or replace with a bullet character: */
-  /* visibility: hidden; */
-  /* position: relative; */
+  position: relative;
 }
 
 /* Optional: replace hyphen with bullet */
 .md-list-item::before {
   content: "•";
   position: absolute;
-  color: var(--md-text-muted);
+  color: var(--md-text);
   font-size: 1rem;
 }
 
