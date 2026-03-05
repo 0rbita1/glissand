@@ -2,9 +2,12 @@ import {
   useEffect,
   useRef,
   useCallback,
+  useState,
   forwardRef,
   useImperativeHandle,
+  type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { EditorView, keymap } from "@codemirror/view";
 import { indentUnit } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
@@ -26,6 +29,7 @@ interface MarkdownEditorProps {
   onChange?: (markdown: string) => void;
   className?: string;
   placeholder?: string;
+  titleSlot?: ReactNode;
 }
 
 export interface MarkdownEditorHandle {
@@ -39,11 +43,15 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
       onChange,
       className = "",
       placeholder = "Start writing…",
+      titleSlot,
     }: MarkdownEditorProps,
     ref,
   ) {
     const containerRef = useRef<HTMLDivElement>(null);
     const viewRef = useRef<EditorView | null>(null);
+    const [titleContainer, setTitleContainer] = useState<HTMLElement | null>(
+      null,
+    );
 
     useImperativeHandle(ref, () => ({
       openFindReplace: () => {
@@ -95,6 +103,14 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
         parent: containerRef.current,
       });
 
+      const slot = document.createElement("div");
+      slot.className = "md-title-slot";
+      viewRef.current.scrollDOM.insertBefore(
+        slot,
+        viewRef.current.scrollDOM.firstChild,
+      );
+      setTitleContainer(slot);
+
       return () => {
         viewRef.current?.destroy();
         viewRef.current = null;
@@ -117,12 +133,17 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
     }, [setContent]);
 
     return (
-      <div
-        ref={containerRef}
-        className={`md-editor-root ${className}`}
-        data-placeholder={placeholder}
-        aria-label="Markdown editor"
-      />
+      <>
+        <div
+          ref={containerRef}
+          className={`md-editor-root ${className}`}
+          data-placeholder={placeholder}
+          aria-label="Markdown editor"
+        />
+        {titleContainer != null &&
+          titleSlot != null &&
+          createPortal(titleSlot, titleContainer)}
+      </>
     );
   },
 );

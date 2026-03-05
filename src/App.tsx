@@ -65,13 +65,13 @@ function App() {
     <>
       <Titlebar />
       <div className="editorContainer">
+        <Title value={title} onChange={handleTitleChange} />
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
             ref={editorRef}
             initialValue={text}
             onChange={handleChange}
             placeholder="Type here…"
-            titleSlot={<Title value={title} onChange={handleTitleChange} />}
           />
         )}
       </div>
