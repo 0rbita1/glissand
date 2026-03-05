@@ -3,13 +3,14 @@ import "./styles/App.css";
 import "./styles/markdownEditor.css";
 import StatisticsBar from "./components/statisticsBar";
 import Titlebar from "./components/titlebar";
-import MarkdownEditor from "./components/markdown/markdownEditor";
+import MarkdownEditor, { type MarkdownEditorHandle } from "./components/markdown/markdownEditor";
 import { readNote } from "./services/fileService";
 import { useAutoSave } from "./hooks/useAutoSave";
 import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
 import HotBar from "./components/hotBar";
 import Title from "./components/title";
+import { writeNote } from "./services/fileService";
 
 function App() {
   const [text, setText] = useState("");
@@ -17,7 +18,7 @@ function App() {
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
   const [isDirty, setIsDirty] = useState(false);
   const [title, setTitle] = useState("");
-  const editorRef = useRef(null);
+  const editorRef = useRef<MarkdownEditorHandle>(null);
 
   const uiVisible = useAutoHideUI();
 
@@ -48,6 +49,16 @@ function App() {
     setTitle(value);
   }
 
+  function handleSave() {
+    writeNote(text).catch((err: unknown) => {
+      console.error("[App] Failed to save note:", err);
+    });
+  }
+
+  function handleFindReplace() {
+    editorRef.current?.openFindReplace();
+  }
+
   return (
     <>
       <Titlebar />
@@ -55,13 +66,14 @@ function App() {
       <div className="editorContainer">
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
+            ref={editorRef}
             initialValue={text}
             onChange={handleChange}
             placeholder="Type here…"
           />
         )}
       </div>
-      <HotBar className={uiVisible ? "" : "ui-hidden"} />
+      <HotBar className={uiVisible ? "" : "ui-hidden"} onSave={handleSave} onFindReplace={handleFindReplace} />
       <StatisticsBar
         text={text}
         lastModified={lastModified}

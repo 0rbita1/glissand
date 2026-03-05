@@ -19,7 +19,20 @@ const hotBarButtons = [
   { id: "cmd-palette", icon: Command, label: "Command Palette" },
 ] as const;
 
-function HotBar({ className = "" }: { className?: string }) {
+function HotBar({
+  className = "",
+  onSave,
+  onFindReplace,
+}: {
+  className?: string;
+  onSave?: () => void;
+  onFindReplace?: () => void;
+}) {
+  const handlers: Partial<Record<string, () => void>> = {
+    save: onSave,
+    "find-replace": onFindReplace,
+  };
+
   return (
     <div className={`hotBar ${className}`}>
       {hotBarButtons.map(({ id, icon: Icon, label }) => (
@@ -28,6 +41,7 @@ function HotBar({ className = "" }: { className?: string }) {
           className="hotBar-btn"
           title={label}
           aria-label={label}
+          onClick={handlers[id]}
         >
           <Icon size={18} strokeWidth={1.6} />
         </button>
