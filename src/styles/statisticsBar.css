@@ -1,0 +1,27 @@
+.statisticsBar {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  border-radius: 15px 0px 0px 0px;
+  gap: 1.5em;
+  padding: 0.3em 0.8em;
+  font-size: 0.8em;
+  color: #dadada;
+  font-family: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.01)
+  );
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.statisticsBar.ui-hidden {
+  opacity: 0;
+  pointer-events: none;
+}

@@ -301,3 +301,11 @@
   accent-color: var(--md-accent);
   cursor: pointer;
 }
+
+.md-title-slot {
+  width: 100%;
+  max-width: var(--md-content-width);
+  margin: 0 auto;
+  padding: var(--md-padding) var(--md-padding) 0.5rem var(--md-padding);
+  box-sizing: border-box;
+}

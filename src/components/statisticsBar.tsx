@@ -1,4 +1,5 @@
 import { StatisticsBarProps } from "../types/components.types";
+import "../styles/statisticsBar.css";
 
 function StatisticsBar({
   text,

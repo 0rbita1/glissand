@@ -1,39 +1,55 @@
 import {
-  ViewPlugin,
   DecorationSet,
-  ViewUpdate,
   EditorView,
   WidgetType,
   Decoration,
 } from "@codemirror/view";
 import {
   RangeSetBuilder,
-  StateEffect,
   EditorSelection,
+  StateField,
+  Transaction,
+  EditorState,
 } from "@codemirror/state";
 import katex from "katex";
 
 // ─── Cursor helpers ───────────────────────────────────────────────────────────
 
-function cursorOnSameLine(from: number, to: number, view: EditorView): boolean {
-  const doc = view.state.doc;
+/** Returns true if any cursor/selection overlaps the given character range. */
+function cursorOverlaps(
+  from: number,
+  to: number,
+  state: EditorState,
+): boolean {
+  for (const sel of state.selection.ranges) {
+    if (sel.from <= to && sel.to >= from) return true;
+  }
+  return false;
+}
+
+/** Returns true if the cursor is on the same LINE as the given range. */
+function cursorOnSameLine(
+  from: number,
+  to: number,
+  state: EditorState,
+): boolean {
+  const doc = state.doc;
   const lineFrom = doc.lineAt(from).number;
   const lineTo = doc.lineAt(to).number;
-  for (const sel of view.state.selection.ranges) {
+  for (const sel of state.selection.ranges) {
     const cursorLine = doc.lineAt(sel.head).number;
     if (cursorLine >= lineFrom && cursorLine <= lineTo) return true;
   }
   return false;
 }
 
-// ─── Block Math Widget (line widget rendered below syntax) ────────────────────
+// ─── Block Math Widget ────────────────────────────────────────────────────────
 
 class BlockMathWidget extends WidgetType {
   constructor(
     readonly tex: string,
-    // Position of content start (right after opening $$) and end (right before closing $$)
-    readonly contentFrom: number,
-    readonly contentTo: number,
+    readonly from: number,
+    readonly to: number,
   ) {
     super();
   }
@@ -61,11 +77,10 @@ class BlockMathWidget extends WidgetType {
       }
     }
 
-    // Clicking the rendered widget moves cursor to start of content and selects it
     div.addEventListener("mousedown", (e) => {
       e.preventDefault();
       view.dispatch({
-        selection: EditorSelection.range(this.contentFrom, this.contentTo),
+        selection: EditorSelection.cursor(this.from + 2),
         scrollIntoView: true,
       });
       view.focus();
@@ -110,14 +125,8 @@ class InlineMathWidget extends WidgetType {
 
 interface BlockMatch {
   kind: "block";
-  // Full extent of the $$ ... $$ syntax (for cursor-on-line check)
   from: number;
   to: number;
-  // The position right after the opening $$ (content start) and right before closing $$
-  contentFrom: number;
-  contentTo: number;
-  // Line at whose END we attach the preview widget
-  widgetLine: number;
   tex: string;
 }
 
@@ -141,31 +150,19 @@ function collectMathMatches(text: string): MathMatch[] {
       const contentFrom = i + 2;
       i += 2;
 
-      // Find closing $$
       const closeIdx = text.indexOf("$$", i);
       if (closeIdx === -1) {
         i++;
         continue;
       }
 
-      const contentTo = closeIdx;
       const fullTo = closeIdx + 2;
-      const tex = text.slice(contentFrom, contentTo);
-
-      // Widget attaches to the END of the last line of the syntax block
-      // We find what line the closing $$ is on
-      const closingLineStart = text.lastIndexOf("\n", closeIdx) + 1;
-      // Count newlines up to closingLineStart to get line number (0-indexed)
-      const widgetLine = (text.slice(0, closingLineStart).match(/\n/g) ?? [])
-        .length;
+      const tex = text.slice(contentFrom, closeIdx);
 
       matches.push({
         kind: "block",
         from: openStart,
         to: fullTo,
-        contentFrom,
-        contentTo,
-        widgetLine,
         tex,
       });
 
@@ -221,40 +218,33 @@ function collectMathMatches(text: string): MathMatch[] {
 
 const hideMark = Decoration.mark({ class: "md-hide" });
 
-function buildMathDecorations(view: EditorView): DecorationSet {
+function buildMathDecorations(state: EditorState): DecorationSet {
   const builder = new RangeSetBuilder<Decoration>();
-  const doc = view.state.doc;
+  const doc = state.doc;
   const text = doc.toString();
 
   const matches = collectMathMatches(text);
 
   for (const match of matches) {
-    const cursorHere = cursorOnSameLine(match.from, match.to, view);
-
     if (match.kind === "block") {
-      // Always add the line widget (real-time preview, always visible)
-      // It attaches to the end of the closing $$ line
-      const widgetLineObj = doc.line(match.widgetLine + 1); // doc.line is 1-indexed
-      builder.add(
-        widgetLineObj.to,
-        widgetLineObj.to,
-        Decoration.widget({
-          widget: new BlockMathWidget(
-            match.tex,
-            match.contentFrom,
-            match.contentTo,
-          ),
-          block: true,
-          side: 1,
-        }),
-      );
+      // Use cursorOnSameLine to reveal the block when cursor is anywhere inside it
+      const cursorHere = cursorOnSameLine(match.from, match.to, state);
 
-      // Hide the syntax when cursor is away
       if (!cursorHere) {
-        builder.add(match.from, match.to, hideMark);
+        // Replace the entire block (from opening $$ to closing $$) with the widget
+        builder.add(
+          match.from,
+          match.to,
+          Decoration.replace({
+            widget: new BlockMathWidget(match.tex, match.from, match.to),
+            block: true,
+          }),
+        );
       }
     } else {
-      // Inline: replace with widget when cursor is away
+      // Use cursorOverlaps for inline math (consistent with livePreviewPlugin)
+      const cursorHere = cursorOverlaps(match.from, match.to, state);
+
       if (!cursorHere) {
         builder.add(
           match.from,
@@ -268,21 +258,19 @@ function buildMathDecorations(view: EditorView): DecorationSet {
   return builder.finish();
 }
 
-// ─── The exported plugin ──────────────────────────────────────────────────────
+// ─── The exported StateField ──────────────────────────────────────────────────
 
-export const mathPlugin = ViewPlugin.fromClass(
-  class {
-    decorations: DecorationSet;
-
-    constructor(view: EditorView) {
-      this.decorations = buildMathDecorations(view);
-    }
-
-    update(update: ViewUpdate) {
-      if (update.docChanged || update.viewportChanged || update.selectionSet) {
-        this.decorations = buildMathDecorations(update.view);
-      }
-    }
+export const mathField = StateField.define<DecorationSet>({
+  create(state) {
+    return buildMathDecorations(state);
   },
-  { decorations: (v) => v.decorations },
-);
+  update(decorations, transaction: Transaction) {
+    if (transaction.docChanged || transaction.selection) {
+      return buildMathDecorations(transaction.state);
+    }
+    return decorations.map(transaction.changes);
+  },
+  provide(field) {
+    return EditorView.decorations.from(field);
+  },
+});
