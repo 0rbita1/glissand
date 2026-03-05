@@ -105,13 +105,15 @@ export function buildDecorations(view: EditorView): DecorationSet {
           const line = view.state.doc.lineAt(node.from);
           const lineText = view.state.doc.sliceString(line.from, line.to);
           const isTaskItem = /^(\s*[-*+])\s+\[[ xX]\]/.test(lineText);
-          const markText = view.state.doc.sliceString(node.from, node.to).trim();
+          const markText = view.state.doc
+            .sliceString(node.from, node.to)
+            .trim();
           const isOrdered = /^\d+[.)]$/.test(markText);
 
-          if (!isTaskItem && !isOrdered) {
+          /*if (!isTaskItem && !isOrdered) {
             builder.add(node.from, node.to, hide);
             builder.add(node.from, node.to, listItem);
-          }
+          }*/
           // Ordered marks (e.g. "1.", "2)") — leave visible, render naturally
         }
 

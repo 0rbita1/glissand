@@ -3,7 +3,9 @@ import "./styles/App.css";
 import "./styles/markdownEditor.css";
 import StatisticsBar from "./components/statisticsBar";
 import Titlebar from "./components/titlebar";
-import MarkdownEditor, { type MarkdownEditorHandle } from "./components/markdown/markdownEditor";
+import MarkdownEditor, {
+  type MarkdownEditorHandle,
+} from "./components/markdown/markdownEditor";
 import { readNote } from "./services/fileService";
 import { useAutoSave } from "./hooks/useAutoSave";
 import { useAutoHideUI } from "./hooks/useAutoHideUI";
@@ -62,7 +64,6 @@ function App() {
   return (
     <>
       <Titlebar />
-      <div className="titleArea"></div>
       <div className="editorContainer">
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
@@ -70,10 +71,15 @@ function App() {
             initialValue={text}
             onChange={handleChange}
             placeholder="Type here…"
+            titleSlot={<Title value={title} onChange={handleTitleChange} />}
           />
         )}
       </div>
-      <HotBar className={uiVisible ? "" : "ui-hidden"} onSave={handleSave} onFindReplace={handleFindReplace} />
+      <HotBar
+        className={uiVisible ? "" : "ui-hidden"}
+        onSave={handleSave}
+        onFindReplace={handleFindReplace}
+      />
       <StatisticsBar
         text={text}
         lastModified={lastModified}

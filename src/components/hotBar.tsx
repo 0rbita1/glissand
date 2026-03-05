@@ -8,15 +8,16 @@ import {
   Command,
 } from "lucide-react";
 import "../styles/hotBar.css";
+import { useState } from "react";
 
 const hotBarButtons = [
   { id: "new-note", icon: FilePlus, label: "New Note" },
-  { id: "save", icon: Save, label: "Save" },
-  { id: "find-replace", icon: Replace, label: "Find & Replace" },
+  { id: "save", icon: Save, label: "Save (Ctrl + S)" },
+  { id: "find-replace", icon: Replace, label: "Find & Replace (Ctrl + F)" },
   { id: "delete-note", icon: Trash2, label: "Delete Note" },
   { id: "note-colour", icon: Palette, label: "Note Colour" },
   { id: "day-night", icon: SunMoon, label: "Day / Night Mode" },
-  { id: "cmd-palette", icon: Command, label: "Command Palette" },
+  { id: "cmd-palette", icon: Command, label: "Command Palette (Ctrl + P)" },
 ] as const;
 
 function HotBar({
@@ -28,6 +29,8 @@ function HotBar({
   onSave?: () => void;
   onFindReplace?: () => void;
 }) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
   const handlers: Partial<Record<string, () => void>> = {
     save: onSave,
     "find-replace": onFindReplace,
@@ -36,15 +39,21 @@ function HotBar({
   return (
     <div className={`hotBar ${className}`}>
       {hotBarButtons.map(({ id, icon: Icon, label }) => (
-        <button
+        <div
           key={id}
-          className="hotBar-btn"
-          title={label}
-          aria-label={label}
-          onClick={handlers[id]}
+          className="hotBar-btn-wrapper"
+          onMouseEnter={() => setHoveredId(id)}
+          onMouseLeave={() => setHoveredId(null)}
         >
-          <Icon size={18} strokeWidth={1.6} />
-        </button>
+          <button
+            className="hotBar-btn"
+            aria-label={label}
+            onClick={handlers[id]}
+          >
+            <Icon size={18} strokeWidth={1.6} />
+          </button>
+          {hoveredId === id && <span className="hotBar-tooltip">{label}</span>}
+        </div>
       ))}
     </div>
   );

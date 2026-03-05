@@ -49,7 +49,7 @@ body,
 
 .editorContainer {
   position: fixed;
-  top: 32px; /* just below titlebar */
+  top: 32px;
   left: 0;
   right: 0;
   bottom: 0;
