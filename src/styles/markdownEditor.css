@@ -39,6 +39,7 @@
   overflow-x: hidden;
   padding: var(--md-padding);
   padding-right: calc(var(--md-padding) + 6px);
+  flex-direction: column;
 }
 
 .md-editor-root .cm-content {
@@ -298,4 +299,31 @@
   vertical-align: middle;
   accent-color: var(--md-accent);
   cursor: pointer;
+}
+
+.md-editor-root .md-title-slot {
+  width: 100%;
+  max-width: var(--md-content-width);
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+.md-title-input {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--md-text);
+  font-family: var(--md-font-body);
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 0;
+  caret-color: var(--md-accent);
+}
+
+.md-title-input::placeholder {
+  color: var(--md-text-faint);
 }

@@ -11,7 +11,6 @@ import { useAutoSave } from "./hooks/useAutoSave";
 import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
 import HotBar from "./components/hotBar";
-import Title from "./components/title";
 import { writeNote } from "./services/fileService";
 
 function App() {
@@ -47,10 +46,6 @@ function App() {
     setIsDirty(true);
   }
 
-  function handleTitleChange(value: string) {
-    setTitle(value);
-  }
-
   function handleSave() {
     writeNote(text).catch((err: unknown) => {
       console.error("[App] Failed to save note:", err);
@@ -65,13 +60,20 @@ function App() {
     <>
       <Titlebar />
       <div className="editorContainer">
-        <Title value={title} onChange={handleTitleChange} />
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
             ref={editorRef}
             initialValue={text}
             onChange={handleChange}
             placeholder="Type here…"
+            titleSlot={
+              <input
+                className="md-title-input"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Untitled"
+              />
+            }
           />
         )}
       </div>
