@@ -6,12 +6,20 @@ import Titlebar from "./components/titlebar";
 import MarkdownEditor, {
   type MarkdownEditorHandle,
 } from "./components/markdown/markdownEditor";
-import { readNote } from "./services/fileService";
+import { readNote, writeNote, renameNote } from "./services/fileService";
 import { useAutoSave } from "./hooks/useAutoSave";
 import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
 import HotBar from "./components/hotBar";
-import { writeNote } from "./services/fileService";
+import { debounce } from "./utils/debounce";
+
+// Windows/macOS/Linux reserved characters that cannot appear in file names.
+const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g;
+const RENAME_DEBOUNCE_MS = 10;
+
+function sanitizeFilename(raw: string): string {
+  return raw.replace(INVALID_FILENAME_CHARS, "").trim();
+}
 
 function App() {
   const [text, setText] = useState("");
@@ -19,11 +27,12 @@ function App() {
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
   const [isDirty, setIsDirty] = useState(false);
   const [title, setTitle] = useState("");
+  // Tracks the filename currently saved on disk (without extension).
+  const currentFilenameRef = useRef("initialNote");
   const editorRef = useRef<MarkdownEditorHandle>(null);
 
   const uiVisible = useAutoHideUI();
 
-  // Load the persisted note once on mount.
   useEffect(() => {
     setLoadState("loading");
     readNote()
@@ -37,8 +46,34 @@ function App() {
       });
   }, []);
 
-  // Auto-save 500 ms after the user stops typing.
   useAutoSave(text, isDirty);
+
+  // Stable debounced rename — recreated only on mount.
+  const debouncedRename = useRef(
+    debounce((newTitle: string) => {
+      const sanitized = sanitizeFilename(newTitle);
+      // Use a fallback filename when the title is empty or whitespace-only.
+      const newFilename = (sanitized || "initialNote") + ".md";
+      const oldFilename = currentFilenameRef.current + ".md";
+
+      if (newFilename === oldFilename) return;
+
+      renameNote(oldFilename, newFilename)
+        .then(() => {
+          currentFilenameRef.current = sanitized || "initialNote";
+        })
+        .catch((err: unknown) => {
+          console.error("[App] Failed to rename note:", err);
+        });
+    }, RENAME_DEBOUNCE_MS),
+  ).current;
+
+  function handleTitleChange(value: string) {
+    // Strip invalid characters immediately so the input never shows them.
+    const cleaned = value.replace(INVALID_FILENAME_CHARS, "");
+    setTitle(cleaned);
+    debouncedRename(cleaned);
+  }
 
   function handleChange(value: string) {
     setText(value);
@@ -67,11 +102,12 @@ function App() {
             onChange={handleChange}
             placeholder="Type here…"
             titleSlot={
-              <input
+              <textarea
                 className="md-title-input"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Untitled"
+                rows={1}
               />
             }
           />
