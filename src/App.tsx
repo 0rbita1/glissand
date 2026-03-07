@@ -91,7 +91,9 @@ function App() {
     editorRef.current?.openFindReplace();
   }
 
-  function handleTitleKeyDown(e) {
+  function handleTitleKeyDown(
+    e: React.KeyboardEvent<HTMLTextAreaElement>,
+  ): void {
     if (e.key === "Enter" || e.key === "ArrowDown") {
       e.preventDefault();
       editorRef.current?.focusAtStart();
