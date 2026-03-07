@@ -13,7 +13,6 @@ import type { NoteLoadState } from "./types/note.types";
 import HotBar from "./components/hotBar";
 import { debounce } from "./utils/debounce";
 
-// Windows/macOS/Linux reserved characters that cannot appear in file names.
 const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g;
 const RENAME_DEBOUNCE_MS = 10;
 
@@ -27,7 +26,6 @@ function App() {
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
   const [isDirty, setIsDirty] = useState(false);
   const [title, setTitle] = useState("");
-  // Tracks the filename currently saved on disk (without extension).
   const currentFilenameRef = useRef("initialNote");
   const editorRef = useRef<MarkdownEditorHandle>(null);
 
@@ -36,8 +34,13 @@ function App() {
   useEffect(() => {
     setLoadState("loading");
     readNote()
-      .then((content) => {
-        setText(content);
+      .then((data) => {
+        setText(data.body);
+        setTitle(data.title);
+        if (data.title) {
+          const sanitized = sanitizeFilename(data.title);
+          currentFilenameRef.current = sanitized || "initialNote";
+        }
         setLoadState("ready");
       })
       .catch((err: unknown) => {
@@ -46,13 +49,12 @@ function App() {
       });
   }, []);
 
-  useAutoSave(text, isDirty);
+  useAutoSave(title, text, isDirty);
 
   // Stable debounced rename — recreated only on mount.
   const debouncedRename = useRef(
     debounce((newTitle: string) => {
       const sanitized = sanitizeFilename(newTitle);
-      // Use a fallback filename when the title is empty or whitespace-only.
       const newFilename = (sanitized || "initialNote") + ".md";
       const oldFilename = currentFilenameRef.current + ".md";
 
@@ -69,10 +71,10 @@ function App() {
   ).current;
 
   function handleTitleChange(value: string) {
-    // Strip invalid characters immediately so the input never shows them.
     const cleaned = value.replace(INVALID_FILENAME_CHARS, "");
     setTitle(cleaned);
     debouncedRename(cleaned);
+    setIsDirty(true);
   }
 
   function handleChange(value: string) {
@@ -82,7 +84,7 @@ function App() {
   }
 
   function handleSave() {
-    writeNote(text).catch((err: unknown) => {
+    writeNote(title, text).catch((err: unknown) => {
       console.error("[App] Failed to save note:", err);
     });
   }

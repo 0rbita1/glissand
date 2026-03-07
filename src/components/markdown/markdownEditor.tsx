@@ -23,6 +23,7 @@ import { languages } from "@codemirror/language-data";
 import { GFM, Strikethrough, Table, TaskList } from "@lezer/markdown";
 import { livePreviewPlugin } from "./plugins/livePreviewPlugin";
 import { mathField } from "./plugins/mathPlugin";
+import { frontmatterPlugin, frontmatterEnd } from "./plugins/frontmatterPlugin";
 
 interface MarkdownEditorProps {
   initialValue?: string;
@@ -62,8 +63,9 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
         const view = viewRef.current;
         if (view) {
           view.focus();
+          const fm = frontmatterEnd(view.state);
           view.dispatch({
-            selection: { anchor: 0 },
+            selection: { anchor: fm === -1 ? 0 : fm },
           });
         }
       },
@@ -96,6 +98,7 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
           }),
           livePreviewPlugin,
           mathField,
+          frontmatterPlugin,
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               onChangeRef.current?.(update.state.doc.toString());
