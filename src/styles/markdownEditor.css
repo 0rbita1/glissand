@@ -310,6 +310,7 @@
   flex-shrink: 0;
 }
 
+/* Hide resize handle, enable wrapping, match content width */
 .md-title-input {
   display: block;
   width: 100%;
@@ -322,6 +323,11 @@
   font-weight: 700;
   padding: 0;
   caret-color: var(--md-accent);
+  resize: none;
+  overflow: hidden;
+  field-sizing: content;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .md-title-input::placeholder {
