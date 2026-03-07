@@ -24,6 +24,7 @@ import { GFM, Strikethrough, Table, TaskList } from "@lezer/markdown";
 import { livePreviewPlugin } from "./plugins/livePreviewPlugin";
 import { mathField } from "./plugins/mathPlugin";
 import { frontmatterPlugin, frontmatterEnd } from "./plugins/frontmatterPlugin";
+import { autoPairPlugin } from "./plugins/autoPairPlugin";
 
 interface MarkdownEditorProps {
   initialValue?: string;
@@ -99,6 +100,7 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
           livePreviewPlugin,
           mathField,
           frontmatterPlugin,
+          autoPairPlugin,
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               onChangeRef.current?.(update.state.doc.toString());
