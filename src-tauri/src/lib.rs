@@ -2,8 +2,67 @@
 use std::fs;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
+use serde::{Deserialize, Serialize};
+use chrono::Utc;
 
 const NOTE_FILENAME: &str = "initialNote.md";
+
+// ---------------------------------------------------------------------------
+// Frontmatter
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Frontmatter {
+    title: String,
+    created: String,
+    modified: String,
+}
+
+/// Returns the current UTC time formatted as `2006-01-02T15:04:05`.
+fn now_iso() -> String {
+    Utc::now().format("%Y-%m-%dT%H:%M:%S").to_string()
+}
+
+/// Splits a `---`-delimited YAML frontmatter block from the rest of `raw`.
+///
+/// Returns `Some((frontmatter, body))` when a valid block is found anchored
+/// at the very start of the string, `None` otherwise (e.g. legacy files).
+fn parse_frontmatter(raw: &str) -> Option<(Frontmatter, String)> {
+    let after_open = raw.strip_prefix("---\n")?;
+
+    let (yaml_str, body) = if let Some(pos) = after_open.find("\n---\n") {
+        (&after_open[..pos], &after_open[pos + 5..])
+    } else if after_open.ends_with("\n---") {
+        (&after_open[..after_open.len() - 4], "")
+    } else {
+        return None;
+    };
+
+    let fm: Frontmatter = serde_yaml::from_str(yaml_str).ok()?;
+    Some((fm, body.to_string()))
+}
+
+/// Serialises `fm` into a `---`-delimited YAML block ready to prepend to a file.
+fn serialize_frontmatter(fm: &Frontmatter) -> String {
+    let yaml = serde_yaml::to_string(fm).unwrap_or_default();
+    format!("---\n{}---\n", yaml)
+}
+
+// ---------------------------------------------------------------------------
+// NoteData — the payload read_note returns to the frontend
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Serialize)]
+struct NoteData {
+    title: String,
+    body: String,
+    created: String,
+    modified: String,
+}
+
+// ---------------------------------------------------------------------------
+// Path helpers
+// ---------------------------------------------------------------------------
 
 fn get_note_path(app: &AppHandle) -> Result<PathBuf, String> {
     let data_dir = app
@@ -21,27 +80,73 @@ fn get_named_note_path(app: &AppHandle, filename: &str) -> Result<PathBuf, Strin
     Ok(data_dir.join(filename))
 }
 
-/// Reads the note from the app local data directory.
-/// Returns an empty string if the note file does not yet exist.
+// ---------------------------------------------------------------------------
+// Tauri commands
+// ---------------------------------------------------------------------------
+
+/// Reads the note, parses any frontmatter, and returns title + body separately.
+/// If the file doesn't exist or has no frontmatter, empty defaults are returned.
 #[tauri::command]
-fn read_note(app: AppHandle) -> Result<String, String> {
+fn read_note(app: AppHandle) -> Result<NoteData, String> {
     let note_path = get_note_path(&app)?;
-    if note_path.exists() {
-        fs::read_to_string(&note_path).map_err(|e| e.to_string())
+
+    if !note_path.exists() {
+        return Ok(NoteData {
+            title: String::new(),
+            body: String::new(),
+            created: String::new(),
+            modified: String::new(),
+        });
+    }
+
+    let raw = fs::read_to_string(&note_path).map_err(|e| e.to_string())?;
+
+    if let Some((fm, body)) = parse_frontmatter(&raw) {
+        Ok(NoteData {
+            title: fm.title,
+            body,
+            created: fm.created,
+            modified: fm.modified,
+        })
     } else {
-        Ok(String::new())
+        // Legacy file with no frontmatter — treat raw content as body.
+        Ok(NoteData {
+            title: String::new(),
+            body: raw,
+            created: String::new(),
+            modified: String::new(),
+        })
     }
 }
 
-/// Writes the provided content to the note file in the app local data directory.
-/// Creates the directory if it does not exist.
+/// Writes the note with updated frontmatter.
+/// Preserves the original `created` timestamp; always refreshes `modified`.
 #[tauri::command]
-fn write_note(app: AppHandle, content: String) -> Result<(), String> {
-    let note_path = get_note_path(&app)?;
+fn write_note(app: AppHandle, filename: String, title: String, content: String) -> Result<(), String> {
+    let note_path = get_named_note_path(&app, &filename)?;
+
     if let Some(parent) = note_path.parent() {
         fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    fs::write(&note_path, content).map_err(|e| e.to_string())
+
+    // Preserve the original created timestamp if the file already has frontmatter.
+    let created = if note_path.exists() {
+        let raw = fs::read_to_string(&note_path).map_err(|e| e.to_string())?;
+        parse_frontmatter(&raw)
+            .map(|(fm, _)| fm.created)
+            .unwrap_or_else(now_iso)
+    } else {
+        now_iso()
+    };
+
+    let fm = Frontmatter {
+        title,
+        created,
+        modified: now_iso(),
+    };
+
+    let full = format!("{}{}", serialize_frontmatter(&fm), content);
+    fs::write(&note_path, full).map_err(|e| e.to_string())
 }
 
 /// Renames the note file. old_filename and new_filename are just the file

@@ -1,11 +1,22 @@
 import { invoke } from "@tauri-apps/api/core";
 
-export async function readNote(): Promise<string> {
-  return await invoke<string>("read_note");
+export interface NoteData {
+  title: string;
+  body: string;
+  created: string;
+  modified: string;
 }
 
-export async function writeNote(content: string): Promise<void> {
-  await invoke<void>("write_note", { content });
+export async function readNote(): Promise<NoteData> {
+  return await invoke<NoteData>("read_note");
+}
+
+export async function writeNote(
+  filename: string,
+  title: string,
+  content: string,
+): Promise<void> {
+  await invoke<void>("write_note", { filename, title, content });
 }
 
 export async function renameNote(
