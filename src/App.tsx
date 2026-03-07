@@ -37,8 +37,10 @@ function App() {
       .then((data) => {
         setText(data.body);
         setTitle(data.title);
-        // Do NOT update currentFilenameRef here — the file on disk is always
-        // initialNote.md at load time, matching the default ref value.
+        if (data.title) {
+          const sanitized = sanitizeFilename(data.title);
+          currentFilenameRef.current = sanitized || "initialNote";
+        }
         setLoadState("ready");
       })
       .catch((err: unknown) => {
