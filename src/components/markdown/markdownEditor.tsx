@@ -34,6 +34,7 @@ interface MarkdownEditorProps {
 
 export interface MarkdownEditorHandle {
   openFindReplace: () => void;
+  focusAtStart: () => void;
 }
 
 const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
@@ -56,6 +57,15 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
     useImperativeHandle(ref, () => ({
       openFindReplace: () => {
         if (viewRef.current) openSearchPanel(viewRef.current);
+      },
+      focusAtStart: () => {
+        const view = viewRef.current;
+        if (view) {
+          view.focus();
+          view.dispatch({
+            selection: { anchor: 0 },
+          });
+        }
       },
     }));
 

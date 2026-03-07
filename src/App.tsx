@@ -91,6 +91,13 @@ function App() {
     editorRef.current?.openFindReplace();
   }
 
+  function handleTitleKeyDown(e) {
+    if (e.key === "Enter" || e.key === "ArrowDown") {
+      e.preventDefault();
+      editorRef.current?.focusAtStart();
+    }
+  }
+
   return (
     <>
       <Titlebar />
@@ -108,6 +115,7 @@ function App() {
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Untitled"
                 rows={1}
+                onKeyDown={handleTitleKeyDown}
               />
             }
           />
