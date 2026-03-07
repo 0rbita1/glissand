@@ -11,8 +11,12 @@ export async function readNote(): Promise<NoteData> {
   return await invoke<NoteData>("read_note");
 }
 
-export async function writeNote(title: string, content: string): Promise<void> {
-  await invoke<void>("write_note", { title, content });
+export async function writeNote(
+  filename: string,
+  title: string,
+  content: string,
+): Promise<void> {
+  await invoke<void>("write_note", { filename, title, content });
 }
 
 export async function renameNote(

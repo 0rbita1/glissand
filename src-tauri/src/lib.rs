@@ -122,8 +122,8 @@ fn read_note(app: AppHandle) -> Result<NoteData, String> {
 /// Writes the note with updated frontmatter.
 /// Preserves the original `created` timestamp; always refreshes `modified`.
 #[tauri::command]
-fn write_note(app: AppHandle, title: String, content: String) -> Result<(), String> {
-    let note_path = get_note_path(&app)?;
+fn write_note(app: AppHandle, filename: String, title: String, content: String) -> Result<(), String> {
+    let note_path = get_named_note_path(&app, &filename)?;
 
     if let Some(parent) = note_path.parent() {
         fs::create_dir_all(parent).map_err(|e| e.to_string())?;

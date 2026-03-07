@@ -37,10 +37,8 @@ function App() {
       .then((data) => {
         setText(data.body);
         setTitle(data.title);
-        if (data.title) {
-          const sanitized = sanitizeFilename(data.title);
-          currentFilenameRef.current = sanitized || "initialNote";
-        }
+        // Do NOT update currentFilenameRef here — the file on disk is always
+        // initialNote.md at load time, matching the default ref value.
         setLoadState("ready");
       })
       .catch((err: unknown) => {
@@ -49,7 +47,7 @@ function App() {
       });
   }, []);
 
-  useAutoSave(title, text, isDirty);
+  useAutoSave(currentFilenameRef, title, text, isDirty);
 
   // Stable debounced rename — recreated only on mount.
   const debouncedRename = useRef(
@@ -84,9 +82,11 @@ function App() {
   }
 
   function handleSave() {
-    writeNote(title, text).catch((err: unknown) => {
-      console.error("[App] Failed to save note:", err);
-    });
+    writeNote(currentFilenameRef.current + ".md", title, text).catch(
+      (err: unknown) => {
+        console.error("[App] Failed to save note:", err);
+      },
+    );
   }
 
   function handleFindReplace() {
