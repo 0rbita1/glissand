@@ -242,10 +242,10 @@
   margin: 0;
   color: var(--md-text);
   overflow-x: auto;
-  border-left: 2px solid var(--md-accent-dim);
+  /*border-left: 2px solid var(--md-accent-dim);*/
   cursor: pointer;
   border-radius: 0 4px 4px 0;
-  background: var(--md-surface);
+  /*background: var(--md-surface);*/
 }
 
 .md-math-block:hover {
@@ -263,7 +263,7 @@
   font-size: 0.8rem;
   font-style: italic;
   text-align: left;
-  border-left: 2px solid var(--md-border);
+  /*border-left: 2px solid var(--md-border);*/
   background: transparent;
 }
 

@@ -54,4 +54,9 @@ body,
   right: 0;
   bottom: 0;
   overflow: hidden;
+  transition: left 0.2s ease;
+}
+
+.editorContainer--shifted {
+  left: 300px;
 }

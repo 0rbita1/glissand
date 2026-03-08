@@ -23,10 +23,8 @@ function SideBar({
     }
   }, [isOpen, refreshKey]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="sidebar">
+    <div className={`sidebar${isOpen ? " sidebar--open" : ""}`}>
       <ul className="sidebar-note-list">
         {noteList.map((note) => (
           <li
