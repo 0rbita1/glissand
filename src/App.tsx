@@ -20,27 +20,30 @@ function sanitizeFilename(raw: string): string {
   return raw.replace(INVALID_FILENAME_CHARS, "").trim();
 }
 
+interface OpenNote {
+  filename: string;
+  title: string;
+  body: string;
+}
+
 function App() {
-  const [text, setText] = useState("");
+  const [openNote, setOpenNote] = useState<OpenNote | null>(null);
   const [lastModified, setLastModified] = useState<Date | null>(null);
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
   const [isDirty, setIsDirty] = useState(false);
-  const [title, setTitle] = useState("");
-  const currentFilenameRef = useRef("initialNote");
   const editorRef = useRef<MarkdownEditorHandle>(null);
+  const openNoteRef = useRef<OpenNote | null>(null);
+  openNoteRef.current = openNote;
 
   const uiVisible = useAutoHideUI();
 
   useEffect(() => {
     setLoadState("loading");
-    readNote(currentFilenameRef.current + ".md")
+    readNote("initialNote.md")
       .then((data) => {
-        setText(data.body);
-        setTitle(data.title);
-        if (data.title) {
-          const sanitized = sanitizeFilename(data.title);
-          currentFilenameRef.current = sanitized || "initialNote";
-        }
+        const sanitized = sanitizeFilename(data.title);
+        const filename = (sanitized || "initialNote") + ".md";
+        setOpenNote({ filename, title: data.title, body: data.body });
         setLoadState("ready");
       })
       .catch((err: unknown) => {
@@ -49,20 +52,29 @@ function App() {
       });
   }, []);
 
-  useAutoSave(currentFilenameRef, title, text, isDirty);
+  useAutoSave(
+    openNote?.filename ?? "",
+    openNote?.title ?? "",
+    openNote?.body ?? "",
+    isDirty,
+  );
 
   // Stable debounced rename — recreated only on mount.
   const debouncedRename = useRef(
     debounce((newTitle: string) => {
+      const current = openNoteRef.current;
+      if (!current) return;
+
       const sanitized = sanitizeFilename(newTitle);
       const newFilename = (sanitized || "initialNote") + ".md";
-      const oldFilename = currentFilenameRef.current + ".md";
 
-      if (newFilename === oldFilename) return;
+      if (newFilename === current.filename) return;
 
-      renameNote(oldFilename, newFilename)
+      renameNote(current.filename, newFilename)
         .then(() => {
-          currentFilenameRef.current = sanitized || "initialNote";
+          setOpenNote((prev) =>
+            prev ? { ...prev, filename: newFilename } : prev,
+          );
         })
         .catch((err: unknown) => {
           console.error("[App] Failed to rename note:", err);
@@ -72,19 +84,20 @@ function App() {
 
   function handleTitleChange(value: string) {
     const cleaned = value.replace(INVALID_FILENAME_CHARS, "");
-    setTitle(cleaned);
+    setOpenNote((prev) => (prev ? { ...prev, title: cleaned } : prev));
     debouncedRename(cleaned);
     setIsDirty(true);
   }
 
   function handleChange(value: string) {
-    setText(value);
+    setOpenNote((prev) => (prev ? { ...prev, body: value } : prev));
     setLastModified(new Date());
     setIsDirty(true);
   }
 
   function handleSave() {
-    writeNote(currentFilenameRef.current + ".md", title, text).catch(
+    if (!openNote) return;
+    writeNote(openNote.filename, openNote.title, openNote.body).catch(
       (err: unknown) => {
         console.error("[App] Failed to save note:", err);
       },
@@ -111,13 +124,13 @@ function App() {
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
             ref={editorRef}
-            initialValue={text}
+            initialValue={openNote?.body ?? ""}
             onChange={handleChange}
             placeholder="Type here…"
             titleSlot={
               <textarea
                 className="md-title-input"
-                value={title}
+                value={openNote?.title ?? ""}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Untitled"
                 rows={1}
@@ -133,7 +146,7 @@ function App() {
         onFindReplace={handleFindReplace}
       />
       <StatisticsBar
-        text={text}
+        text={openNote?.body ?? ""}
         lastModified={lastModified}
         className={uiVisible ? "" : "ui-hidden"}
       />
