@@ -37,12 +37,11 @@ function App() {
 
   const uiVisible = useAutoHideUI();
 
-  useEffect(() => {
+  function loadNote(filename: string) {
     setLoadState("loading");
-    readNote("initialNote.md")
+    setIsDirty(false);
+    readNote(filename)
       .then((data) => {
-        const sanitized = sanitizeFilename(data.title);
-        const filename = (sanitized || "initialNote") + ".md";
         setOpenNote({ filename, title: data.title, body: data.body });
         setLoadState("ready");
       })
@@ -50,6 +49,10 @@ function App() {
         console.error("[App] Failed to load note:", err);
         setLoadState("error");
       });
+  }
+
+  useEffect(() => {
+    loadNote("initialNote.md");
   }, []);
 
   useAutoSave(
