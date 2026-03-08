@@ -11,12 +11,12 @@ import "../styles/hotBar.css";
 import { useState } from "react";
 
 const hotBarButtons = [
-  { id: "new-note", icon: FilePlus, label: "New Note" },
+  { id: "new-note", icon: FilePlus, label: "New Note (Ctrl + N)" },
   { id: "save", icon: Save, label: "Save (Ctrl + S)" },
   { id: "find-replace", icon: Replace, label: "Find & Replace (Ctrl + F)" },
   { id: "delete-note", icon: Trash2, label: "Delete Note" },
   { id: "note-colour", icon: Palette, label: "Note Colour" },
-  { id: "day-night", icon: SunMoon, label: "Day / Night Mode" },
+  { id: "day-night", icon: SunMoon, label: "Day / Night Mode (Ctrl + M)" },
   { id: "cmd-palette", icon: Command, label: "Command Palette (Ctrl + P)" },
 ] as const;
 
@@ -27,6 +27,7 @@ function HotBar({
   onNewNote,
   onDeleteNote,
   onDayNight,
+  onCmdPalette,
   isDayMode = false,
 }: {
   className?: string;
@@ -35,6 +36,7 @@ function HotBar({
   onNewNote?: () => void;
   onDeleteNote?: () => void;
   onDayNight?: () => void;
+  onCmdPalette?: () => void;
   isDayMode?: boolean;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -45,6 +47,7 @@ function HotBar({
     "new-note": onNewNote,
     "delete-note": onDeleteNote,
     "day-night": onDayNight,
+    "cmd-palette": onCmdPalette,
   };
 
   return (

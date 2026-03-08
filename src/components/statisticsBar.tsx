@@ -9,7 +9,7 @@ function StatisticsBar({
   const wordCount = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
   const characterCount = text.length;
   const modifiedTime = lastModified
-    ? lastModified.toLocaleTimeString()
+    ? new Date(lastModified + "Z").toLocaleTimeString() // append Z since the string is UTC
     : "Never";
 
   return (
