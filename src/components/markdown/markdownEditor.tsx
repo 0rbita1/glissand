@@ -17,7 +17,12 @@ import {
   historyKeymap,
   indentWithTab,
 } from "@codemirror/commands";
-import { search, searchKeymap, openSearchPanel } from "@codemirror/search";
+import {
+  search,
+  searchKeymap,
+  openSearchPanel,
+  closeSearchPanel,
+} from "@codemirror/search";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { GFM, Strikethrough, Table, TaskList } from "@lezer/markdown";
@@ -25,6 +30,7 @@ import { livePreviewPlugin } from "./plugins/livePreviewPlugin";
 import { mathField } from "./plugins/mathPlugin";
 import { frontmatterPlugin, frontmatterEnd } from "./plugins/frontmatterPlugin";
 import { autoPairPlugin } from "./plugins/autoPairPlugin";
+import { FindReplacePanel } from "./FindReplacePanel";
 
 interface MarkdownEditorProps {
   initialValue?: string;
@@ -35,7 +41,7 @@ interface MarkdownEditorProps {
 }
 
 export interface MarkdownEditorHandle {
-  openFindReplace: () => void;
+  toggleFindReplace: () => void;
   focusAtStart: () => void;
 }
 
@@ -55,22 +61,35 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
     const [titleContainer, setTitleContainer] = useState<HTMLElement | null>(
       null,
     );
+    const [panelState, setPanelState] = useState<{
+      overlay: HTMLElement;
+      view: EditorView;
+    } | null>(null);
 
-    useImperativeHandle(ref, () => ({
-      openFindReplace: () => {
-        if (viewRef.current) openSearchPanel(viewRef.current);
-      },
-      focusAtStart: () => {
-        const view = viewRef.current;
-        if (view) {
-          view.focus();
-          const fm = frontmatterEnd(view.state);
-          view.dispatch({
-            selection: { anchor: fm === -1 ? 0 : fm },
-          });
-        }
-      },
-    }));
+    useImperativeHandle(
+      ref,
+      () => ({
+        toggleFindReplace: () => {
+          if (!viewRef.current) return;
+          if (panelState) {
+            closeSearchPanel(viewRef.current);
+          } else {
+            openSearchPanel(viewRef.current);
+          }
+        },
+        focusAtStart: () => {
+          const view = viewRef.current;
+          if (view) {
+            view.focus();
+            const fm = frontmatterEnd(view.state);
+            view.dispatch({
+              selection: { anchor: fm === -1 ? 0 : fm },
+            });
+          }
+        },
+      }),
+      [panelState],
+    );
 
     const onChangeRef = useRef(onChange);
     useEffect(() => {
@@ -91,7 +110,25 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
             ...historyKeymap,
             ...searchKeymap,
           ]),
-          search(),
+          search({
+            createPanel(view) {
+              // Placeholder node CM manages for show/hide lifecycle.
+              const dom = document.createElement("div");
+              // Actual panel lives in document.body so position:fixed is unaffected
+              // by any ancestor overflow/transform on the editor tree.
+              const overlay = document.createElement("div");
+              overlay.className = "fr-overlay";
+              document.body.appendChild(overlay);
+              setTimeout(() => setPanelState({ overlay, view }), 0);
+              return {
+                dom,
+                destroy() {
+                  setPanelState(null);
+                  overlay.remove();
+                },
+              };
+            },
+          }),
           markdown({
             base: markdownLanguage,
             codeLanguages: languages,
@@ -158,6 +195,11 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
         {titleContainer != null &&
           titleSlot != null &&
           createPortal(titleSlot, titleContainer)}
+        {panelState != null &&
+          createPortal(
+            <FindReplacePanel view={panelState.view} />,
+            panelState.overlay,
+          )}
       </>
     );
   },

@@ -6,11 +6,19 @@ import Titlebar from "./components/titlebar";
 import MarkdownEditor, {
   type MarkdownEditorHandle,
 } from "./components/markdown/markdownEditor";
-import { readNote, writeNote, renameNote } from "./services/fileService";
+import {
+  readNote,
+  writeNote,
+  renameNote,
+  createNote,
+  deleteNote,
+  listNotes,
+} from "./services/fileService";
 import { useAutoSave } from "./hooks/useAutoSave";
 import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
 import HotBar from "./components/hotBar";
+import SideBar from "./components/sideBar";
 import { debounce } from "./utils/debounce";
 
 const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g;
@@ -20,49 +28,67 @@ function sanitizeFilename(raw: string): string {
   return raw.replace(INVALID_FILENAME_CHARS, "").trim();
 }
 
+interface OpenNote {
+  filename: string;
+  title: string;
+  body: string;
+}
+
 function App() {
-  const [text, setText] = useState("");
+  const [sideBarOpen, setSideBarOpen] = useState(false);
+  const [sideBarRefreshKey, setSideBarRefreshKey] = useState(0);
+  const [isDayMode, setIsDayMode] = useState(false);
+  const [openNote, setOpenNote] = useState<OpenNote | null>(null);
   const [lastModified, setLastModified] = useState<Date | null>(null);
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
   const [isDirty, setIsDirty] = useState(false);
-  const [title, setTitle] = useState("");
-  const currentFilenameRef = useRef("initialNote");
   const editorRef = useRef<MarkdownEditorHandle>(null);
+  const openNoteRef = useRef<OpenNote | null>(null);
+  openNoteRef.current = openNote;
 
-  const uiVisible = useAutoHideUI();
+  const uiVisible = useAutoHideUI(sideBarOpen);
 
-  useEffect(() => {
+  function loadNote(filename: string) {
     setLoadState("loading");
-    readNote()
+    setIsDirty(false);
+    readNote(filename)
       .then((data) => {
-        setText(data.body);
-        setTitle(data.title);
-        if (data.title) {
-          const sanitized = sanitizeFilename(data.title);
-          currentFilenameRef.current = sanitized || "initialNote";
-        }
+        setOpenNote({ filename, title: data.title, body: data.body });
         setLoadState("ready");
       })
       .catch((err: unknown) => {
         console.error("[App] Failed to load note:", err);
         setLoadState("error");
       });
+  }
+
+  useEffect(() => {
+    loadNote("initialNote.md");
   }, []);
 
-  useAutoSave(currentFilenameRef, title, text, isDirty);
+  useAutoSave(
+    openNote?.filename ?? "",
+    openNote?.title ?? "",
+    openNote?.body ?? "",
+    isDirty,
+  );
 
   // Stable debounced rename — recreated only on mount.
   const debouncedRename = useRef(
     debounce((newTitle: string) => {
+      const current = openNoteRef.current;
+      if (!current) return;
+
       const sanitized = sanitizeFilename(newTitle);
       const newFilename = (sanitized || "initialNote") + ".md";
-      const oldFilename = currentFilenameRef.current + ".md";
 
-      if (newFilename === oldFilename) return;
+      if (newFilename === current.filename) return;
 
-      renameNote(oldFilename, newFilename)
+      renameNote(current.filename, newFilename)
         .then(() => {
-          currentFilenameRef.current = sanitized || "initialNote";
+          setOpenNote((prev) =>
+            prev ? { ...prev, filename: newFilename } : prev,
+          );
         })
         .catch((err: unknown) => {
           console.error("[App] Failed to rename note:", err);
@@ -72,19 +98,59 @@ function App() {
 
   function handleTitleChange(value: string) {
     const cleaned = value.replace(INVALID_FILENAME_CHARS, "");
-    setTitle(cleaned);
+    setOpenNote((prev) => (prev ? { ...prev, title: cleaned } : prev));
     debouncedRename(cleaned);
     setIsDirty(true);
   }
 
   function handleChange(value: string) {
-    setText(value);
+    setOpenNote((prev) => (prev ? { ...prev, body: value } : prev));
     setLastModified(new Date());
     setIsDirty(true);
   }
 
+  function handleDeleteNote() {
+    const current = openNoteRef.current;
+    if (!current) return;
+
+    listNotes()
+      .then((notes) => {
+        const idx = notes.findIndex((n) => n.filename === current.filename);
+        const next =
+          idx !== -1 && notes.length > 1
+            ? (notes[idx + 1] ?? notes[idx - 1])
+            : null;
+        return deleteNote(current.filename).then(() => next);
+      })
+      .then((next) => {
+        setIsDirty(false);
+        setSideBarRefreshKey((k) => k + 1);
+        if (next) {
+          loadNote(next.filename);
+        } else {
+          setOpenNote(null);
+          setLoadState("ready");
+        }
+      })
+      .catch((err: unknown) => {
+        console.error("[App] Failed to delete note:", err);
+      });
+  }
+
+  function handleNewNote() {
+    createNote()
+      .then((filename) => {
+        setSideBarRefreshKey((k) => k + 1);
+        loadNote(filename);
+      })
+      .catch((err: unknown) => {
+        console.error("[App] Failed to create note:", err);
+      });
+  }
+
   function handleSave() {
-    writeNote(currentFilenameRef.current + ".md", title, text).catch(
+    if (!openNote) return;
+    writeNote(openNote.filename, openNote.title, openNote.body).catch(
       (err: unknown) => {
         console.error("[App] Failed to save note:", err);
       },
@@ -92,7 +158,15 @@ function App() {
   }
 
   function handleFindReplace() {
-    editorRef.current?.openFindReplace();
+    editorRef.current?.toggleFindReplace();
+  }
+
+  function handleToggleDayNight() {
+    setIsDayMode((prev) => {
+      const next = !prev;
+      document.documentElement.dataset.theme = next ? "day" : "";
+      return next;
+    });
   }
 
   function handleTitleKeyDown(
@@ -106,18 +180,26 @@ function App() {
 
   return (
     <>
-      <Titlebar />
-      <div className="editorContainer">
+      <Titlebar onToggleSidebar={() => setSideBarOpen((o) => !o)} />
+      <SideBar
+        isOpen={sideBarOpen}
+        onOpenNote={loadNote}
+        activeFilename={openNote?.filename}
+        refreshKey={sideBarRefreshKey}
+      />
+      <div
+        className={`editorContainer${sideBarOpen ? " editorContainer--shifted" : ""}`}
+      >
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
             ref={editorRef}
-            initialValue={text}
+            initialValue={openNote?.body ?? ""}
             onChange={handleChange}
             placeholder="Type here…"
             titleSlot={
               <textarea
                 className="md-title-input"
-                value={title}
+                value={openNote?.title ?? ""}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Untitled"
                 rows={1}
@@ -131,9 +213,13 @@ function App() {
         className={uiVisible ? "" : "ui-hidden"}
         onSave={handleSave}
         onFindReplace={handleFindReplace}
+        onNewNote={handleNewNote}
+        onDeleteNote={handleDeleteNote}
+        onDayNight={handleToggleDayNight}
+        isDayMode={isDayMode}
       />
       <StatisticsBar
-        text={text}
+        text={openNote?.body ?? ""}
         lastModified={lastModified}
         className={uiVisible ? "" : "ui-hidden"}
       />

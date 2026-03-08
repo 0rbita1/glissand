@@ -7,8 +7,22 @@ export interface NoteData {
   modified: string;
 }
 
-export async function readNote(): Promise<NoteData> {
-  return await invoke<NoteData>("read_note");
+export interface NoteMetadata {
+  filename: string;
+  title: string;
+  modified: string;
+}
+
+export async function createNote(): Promise<string> {
+  return await invoke<string>("create_note");
+}
+
+export async function listNotes(): Promise<NoteMetadata[]> {
+  return await invoke<NoteMetadata[]>("list_notes");
+}
+
+export async function readNote(filename: string): Promise<NoteData> {
+  return await invoke<NoteData>("read_note", { filename });
 }
 
 export async function writeNote(
@@ -17,6 +31,10 @@ export async function writeNote(
   content: string,
 ): Promise<void> {
   await invoke<void>("write_note", { filename, title, content });
+}
+
+export async function deleteNote(filename: string): Promise<void> {
+  await invoke<void>("delete_note", { filename });
 }
 
 export async function renameNote(

@@ -1,6 +1,6 @@
 .titlebar {
   height: 32px;
-  background: #1e1e1e;
+  background: var(--md-border);
   user-select: none;
   display: flex;
   align-items: center;
@@ -12,8 +12,19 @@
   z-index: 1000;
 }
 
-.titlebar-title {
-  padding-left: 12px;
+.titlebar-left {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.titlebar-btn.sidebar-toggle-btn {
+  width: 40px;
+  color: #888;
+}
+
+.titlebar-btn.sidebar-toggle-btn:hover {
+  color: #dadada;
 }
 
 .titlebar-controls {
@@ -25,7 +36,7 @@
   appearance: none;
   border: none;
   background: transparent;
-  color: #dadada;
+  color: var(--app-text);
   width: 46px;
   height: 32px;
   display: inline-flex;
@@ -55,4 +66,5 @@
 
 .titlebar-btn.pin-btn:hover {
   background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
 }

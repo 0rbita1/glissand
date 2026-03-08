@@ -5,8 +5,6 @@ use tauri::{AppHandle, Manager};
 use serde::{Deserialize, Serialize};
 use chrono::Utc;
 
-const NOTE_FILENAME: &str = "initialNote.md";
-
 // ---------------------------------------------------------------------------
 // Frontmatter
 // ---------------------------------------------------------------------------
@@ -61,16 +59,19 @@ struct NoteData {
 }
 
 // ---------------------------------------------------------------------------
-// Path helpers
+// NoteMetadata — lightweight payload for sidebar listing
 // ---------------------------------------------------------------------------
 
-fn get_note_path(app: &AppHandle) -> Result<PathBuf, String> {
-    let data_dir = app
-        .path()
-        .app_local_data_dir()
-        .map_err(|e| e.to_string())?;
-    Ok(data_dir.join(NOTE_FILENAME))
+#[derive(Debug, Serialize)]
+struct NoteMetadata {
+    filename: String,
+    title: String,
+    modified: String,
 }
+
+// ---------------------------------------------------------------------------
+// Path helpers
+// ---------------------------------------------------------------------------
 
 fn get_named_note_path(app: &AppHandle, filename: &str) -> Result<PathBuf, String> {
     let data_dir = app
@@ -87,8 +88,8 @@ fn get_named_note_path(app: &AppHandle, filename: &str) -> Result<PathBuf, Strin
 /// Reads the note, parses any frontmatter, and returns title + body separately.
 /// If the file doesn't exist or has no frontmatter, empty defaults are returned.
 #[tauri::command]
-fn read_note(app: AppHandle) -> Result<NoteData, String> {
-    let note_path = get_note_path(&app)?;
+fn read_note(app: AppHandle, filename: String) -> Result<NoteData, String> {
+    let note_path = get_named_note_path(&app, &filename)?;
 
     if !note_path.exists() {
         return Ok(NoteData {
@@ -167,11 +168,112 @@ fn rename_note(app: AppHandle, old_filename: String, new_filename: String) -> Re
     fs::rename(&old_path, &new_path).map_err(|e| e.to_string())
 }
 
+/// Returns metadata for every `.md` file in the app data directory.
+/// Only frontmatter is parsed — the note body is never read into memory.
+#[tauri::command]
+fn list_notes(app: AppHandle) -> Result<Vec<NoteMetadata>, String> {
+    let data_dir = app
+        .path()
+        .app_local_data_dir()
+        .map_err(|e| e.to_string())?;
+
+    if !data_dir.exists() {
+        return Ok(Vec::new());
+    }
+
+    let entries = fs::read_dir(&data_dir).map_err(|e| e.to_string())?;
+    let mut notes = Vec::new();
+
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("md") {
+            continue;
+        }
+
+        let filename = match path.file_name().and_then(|n| n.to_str()) {
+            Some(n) => n.to_string(),
+            None => continue,
+        };
+
+        let content = fs::read_to_string(&path).unwrap_or_default();
+
+        let (title, modified) = if let Some((fm, _)) = parse_frontmatter(&content) {
+            (fm.title, fm.modified)
+        } else {
+            // Legacy file: derive title from stem, modified from filesystem.
+            let stem = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or(&filename)
+                .to_string();
+            let modified = entry
+                .metadata()
+                .ok()
+                .and_then(|m| m.modified().ok())
+                .map(|t| {
+                    let dt: chrono::DateTime<Utc> = t.into();
+                    dt.format("%Y-%m-%dT%H:%M:%S").to_string()
+                })
+                .unwrap_or_default();
+            (stem, modified)
+        };
+
+        notes.push(NoteMetadata { filename, title, modified });
+    }
+
+    Ok(notes)
+}
+
+/// Deletes a note file permanently.
+#[tauri::command]
+fn delete_note(app: AppHandle, filename: String) -> Result<(), String> {
+    let note_path = get_named_note_path(&app, &filename)?;
+
+    if !note_path.exists() {
+        return Err(format!("File does not exist: {}", filename));
+    }
+
+    fs::remove_file(&note_path).map_err(|e| e.to_string())
+}
+
+/// Creates a new note with an empty title.
+/// Uses "initialNote.md" as the base filename (matching the frontend's
+/// `sanitized || "initialNote"` fallback), appending -1, -2, … on collision.
+/// Returns the chosen filename so the frontend knows what to open.
+#[tauri::command]
+fn create_note(app: AppHandle) -> Result<String, String> {
+    let data_dir = app
+        .path()
+        .app_local_data_dir()
+        .map_err(|e| e.to_string())?;
+
+    fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
+
+    let base = "initialNote";
+    let mut filename = format!("{}.md", base);
+    let mut counter = 1u32;
+    while data_dir.join(&filename).exists() {
+        filename = format!("{}-{}.md", base, counter);
+        counter += 1;
+    }
+
+    let now = now_iso();
+    let fm = Frontmatter {
+        title: String::new(),
+        created: now.clone(),
+        modified: now,
+    };
+    fs::write(data_dir.join(&filename), serialize_frontmatter(&fm))
+        .map_err(|e| e.to_string())?;
+
+    Ok(filename)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![read_note, write_note, rename_note])
+        .invoke_handler(tauri::generate_handler![read_note, write_note, rename_note, list_notes, create_note, delete_note])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
