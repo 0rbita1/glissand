@@ -25,11 +25,13 @@ function HotBar({
   onSave,
   onFindReplace,
   onNewNote,
+  onDeleteNote,
 }: {
   className?: string;
   onSave?: () => void;
   onFindReplace?: () => void;
   onNewNote?: () => void;
+  onDeleteNote?: () => void;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -37,6 +39,7 @@ function HotBar({
     save: onSave,
     "find-replace": onFindReplace,
     "new-note": onNewNote,
+    "delete-note": onDeleteNote,
   };
 
   return (

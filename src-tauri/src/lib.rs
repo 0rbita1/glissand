@@ -224,6 +224,18 @@ fn list_notes(app: AppHandle) -> Result<Vec<NoteMetadata>, String> {
     Ok(notes)
 }
 
+/// Deletes a note file permanently.
+#[tauri::command]
+fn delete_note(app: AppHandle, filename: String) -> Result<(), String> {
+    let note_path = get_named_note_path(&app, &filename)?;
+
+    if !note_path.exists() {
+        return Err(format!("File does not exist: {}", filename));
+    }
+
+    fs::remove_file(&note_path).map_err(|e| e.to_string())
+}
+
 /// Creates a new note with an empty title.
 /// Uses "initialNote.md" as the base filename (matching the frontend's
 /// `sanitized || "initialNote"` fallback), appending -1, -2, … on collision.
@@ -261,7 +273,7 @@ fn create_note(app: AppHandle) -> Result<String, String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![read_note, write_note, rename_note, list_notes, create_note])
+        .invoke_handler(tauri::generate_handler![read_note, write_note, rename_note, list_notes, create_note, delete_note])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -33,6 +33,10 @@ export async function writeNote(
   await invoke<void>("write_note", { filename, title, content });
 }
 
+export async function deleteNote(filename: string): Promise<void> {
+  await invoke<void>("delete_note", { filename });
+}
+
 export async function renameNote(
   oldFilename: string,
   newFilename: string,

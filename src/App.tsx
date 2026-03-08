@@ -6,7 +6,14 @@ import Titlebar from "./components/titlebar";
 import MarkdownEditor, {
   type MarkdownEditorHandle,
 } from "./components/markdown/markdownEditor";
-import { readNote, writeNote, renameNote, createNote } from "./services/fileService";
+import {
+  readNote,
+  writeNote,
+  renameNote,
+  createNote,
+  deleteNote,
+  listNotes,
+} from "./services/fileService";
 import { useAutoSave } from "./hooks/useAutoSave";
 import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
@@ -101,6 +108,34 @@ function App() {
     setIsDirty(true);
   }
 
+  function handleDeleteNote() {
+    const current = openNoteRef.current;
+    if (!current) return;
+
+    listNotes()
+      .then((notes) => {
+        const idx = notes.findIndex((n) => n.filename === current.filename);
+        const next =
+          idx !== -1 && notes.length > 1
+            ? (notes[idx + 1] ?? notes[idx - 1])
+            : null;
+        return deleteNote(current.filename).then(() => next);
+      })
+      .then((next) => {
+        setIsDirty(false);
+        setSideBarRefreshKey((k) => k + 1);
+        if (next) {
+          loadNote(next.filename);
+        } else {
+          setOpenNote(null);
+          setLoadState("ready");
+        }
+      })
+      .catch((err: unknown) => {
+        console.error("[App] Failed to delete note:", err);
+      });
+  }
+
   function handleNewNote() {
     createNote()
       .then((filename) => {
@@ -168,6 +203,7 @@ function App() {
         onSave={handleSave}
         onFindReplace={handleFindReplace}
         onNewNote={handleNewNote}
+        onDeleteNote={handleDeleteNote}
       />
       <StatisticsBar
         text={openNote?.body ?? ""}

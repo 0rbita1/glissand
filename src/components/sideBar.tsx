@@ -9,7 +9,12 @@ interface SideBarProps {
   refreshKey?: number;
 }
 
-function SideBar({ isOpen, onOpenNote, activeFilename, refreshKey }: SideBarProps) {
+function SideBar({
+  isOpen,
+  onOpenNote,
+  activeFilename,
+  refreshKey,
+}: SideBarProps) {
   const [noteList, setNoteList] = useState<NoteMetadata[]>([]);
 
   useEffect(() => {
