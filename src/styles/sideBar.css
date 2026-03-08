@@ -4,7 +4,27 @@
   left: 0;
   width: 300px;
   height: calc(100vh - 32px);
-  background: #252526;
+  background: #1e1e1e;
   z-index: 900;
-  border-right: 1px solid #3c3c3c;
+  overflow-y: auto;
+}
+
+.sidebar-note-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.sidebar-note-item {
+  padding: 6px 16px;
+  font-size: 13px;
+  color: #cccccc;
+  cursor: default;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-note-item:hover {
+  background: rgba(255, 255, 255, 0.07);
 }
