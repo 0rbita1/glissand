@@ -19,7 +19,9 @@ import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
 import HotBar from "./components/hotBar";
 import SideBar from "./components/sideBar";
+import CommandPalette from "./components/commandPalette";
 import { debounce } from "./utils/debounce";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 
 const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g;
 const RENAME_DEBOUNCE_MS = 10;
@@ -32,6 +34,7 @@ interface OpenNote {
   filename: string;
   title: string;
   body: string;
+  modified: string;
 }
 
 function App() {
@@ -42,18 +45,25 @@ function App() {
   const [lastModified, setLastModified] = useState<Date | null>(null);
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
   const [isDirty, setIsDirty] = useState(false);
+  const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
   const editorRef = useRef<MarkdownEditorHandle>(null);
   const openNoteRef = useRef<OpenNote | null>(null);
   openNoteRef.current = openNote;
 
-  const uiVisible = useAutoHideUI(sideBarOpen);
+  const hotBarVisible = useAutoHideUI(false);
+  const statsBarVisible = useAutoHideUI(sideBarOpen);
 
   function loadNote(filename: string) {
     setLoadState("loading");
     setIsDirty(false);
     readNote(filename)
       .then((data) => {
-        setOpenNote({ filename, title: data.title, body: data.body });
+        setOpenNote({
+          filename,
+          title: data.title,
+          body: data.body,
+          modified: data.modified,
+        });
         setLoadState("ready");
       })
       .catch((err: unknown) => {
@@ -161,6 +171,10 @@ function App() {
     editorRef.current?.toggleFindReplace();
   }
 
+  function handleCmdPalette() {
+    setCmdPaletteOpen((prev) => !prev);
+  }
+
   function handleToggleDayNight() {
     setIsDayMode((prev) => {
       const next = !prev;
@@ -177,6 +191,14 @@ function App() {
       editorRef.current?.focusAtStart();
     }
   }
+
+  useKeyboardShortcuts([
+    { key: "n", ctrl: true, action: handleNewNote },
+    { key: "m", ctrl: true, action: handleToggleDayNight },
+    { key: "d", ctrl: true, action: handleDeleteNote },
+    { key: "s", ctrl: true, action: handleSave },
+    { key: "p", ctrl: true, action: handleCmdPalette },
+  ]);
 
   return (
     <>
@@ -210,18 +232,22 @@ function App() {
         )}
       </div>
       <HotBar
-        className={uiVisible ? "" : "ui-hidden"}
+        className={hotBarVisible ? "" : "ui-hidden"}
         onSave={handleSave}
         onFindReplace={handleFindReplace}
         onNewNote={handleNewNote}
         onDeleteNote={handleDeleteNote}
         onDayNight={handleToggleDayNight}
+        onCmdPalette={handleCmdPalette}
         isDayMode={isDayMode}
       />
+      {cmdPaletteOpen && (
+        <CommandPalette onClose={() => setCmdPaletteOpen(false)} />
+      )}
       <StatisticsBar
         text={openNote?.body ?? ""}
-        lastModified={lastModified}
-        className={uiVisible ? "" : "ui-hidden"}
+        lastModified={openNote?.modified ?? ""}
+        className={statsBarVisible ? "" : "ui-hidden"}
       />
     </>
   );

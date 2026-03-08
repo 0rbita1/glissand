@@ -1,6 +1,6 @@
 export type StatisticsBarProps = {
   text: string;
-  lastModified: Date | null;
+  lastModified: string;
 };
 
 export interface MarkdownEditorProps {

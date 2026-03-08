@@ -1,0 +1,131 @@
+@keyframes cmdp-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.cmdp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cmdp-panel {
+  background: var(--md-surface);
+  border: 1px solid var(--md-border);
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90vw;
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  animation: cmdp-enter 0.17s ease;
+}
+
+.cmdp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--md-border);
+  flex-shrink: 0;
+}
+
+.cmdp-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--md-text-muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.cmdp-close {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--md-text-muted);
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  padding: 0;
+}
+
+.cmdp-close:hover {
+  background: rgba(128, 128, 128, 0.15);
+  color: var(--md-text);
+}
+
+.cmdp-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  overflow-y: auto;
+}
+
+.cmdp-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.cmdp-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cmdp-list::-webkit-scrollbar-thumb {
+  background: var(--md-border);
+  border-radius: 3px;
+}
+
+.cmdp-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 9px 18px;
+  transition: background 0.1s;
+}
+
+.cmdp-item:hover {
+  background: rgba(128, 128, 128, 0.08);
+}
+
+.cmdp-item-icon {
+  color: var(--md-accent);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.cmdp-item-title {
+  font-size: 0.88rem;
+  color: var(--md-text);
+  flex: 1;
+  min-width: 0;
+}
+
+.cmdp-item-syntax {
+  font-family: var(--md-font-mono);
+  font-size: 0.78rem;
+  color: var(--md-text-muted);
+  background: var(--md-code-bg);
+  padding: 3px 9px;
+  border-radius: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

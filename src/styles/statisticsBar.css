@@ -18,7 +18,9 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   pointer-events: none;
   opacity: 1;
-  transition: opacity 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    color 0.35s ease;
 }
 
 .statisticsBar.ui-hidden {
