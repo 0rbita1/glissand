@@ -24,16 +24,19 @@ function HotBar({
   className = "",
   onSave,
   onFindReplace,
+  onNewNote,
 }: {
   className?: string;
   onSave?: () => void;
   onFindReplace?: () => void;
+  onNewNote?: () => void;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const handlers: Partial<Record<string, () => void>> = {
     save: onSave,
     "find-replace": onFindReplace,
+    "new-note": onNewNote,
   };
 
   return (

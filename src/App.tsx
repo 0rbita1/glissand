@@ -6,7 +6,7 @@ import Titlebar from "./components/titlebar";
 import MarkdownEditor, {
   type MarkdownEditorHandle,
 } from "./components/markdown/markdownEditor";
-import { readNote, writeNote, renameNote } from "./services/fileService";
+import { readNote, writeNote, renameNote, createNote } from "./services/fileService";
 import { useAutoSave } from "./hooks/useAutoSave";
 import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
@@ -29,6 +29,7 @@ interface OpenNote {
 
 function App() {
   const [sideBarOpen, setSideBarOpen] = useState(false);
+  const [sideBarRefreshKey, setSideBarRefreshKey] = useState(0);
   const [openNote, setOpenNote] = useState<OpenNote | null>(null);
   const [lastModified, setLastModified] = useState<Date | null>(null);
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
@@ -100,6 +101,17 @@ function App() {
     setIsDirty(true);
   }
 
+  function handleNewNote() {
+    createNote()
+      .then((filename) => {
+        setSideBarRefreshKey((k) => k + 1);
+        loadNote(filename);
+      })
+      .catch((err: unknown) => {
+        console.error("[App] Failed to create note:", err);
+      });
+  }
+
   function handleSave() {
     if (!openNote) return;
     writeNote(openNote.filename, openNote.title, openNote.body).catch(
@@ -129,6 +141,7 @@ function App() {
         isOpen={sideBarOpen}
         onOpenNote={loadNote}
         activeFilename={openNote?.filename}
+        refreshKey={sideBarRefreshKey}
       />
       <div className="editorContainer">
         {(loadState === "ready" || loadState === "error") && (
@@ -154,6 +167,7 @@ function App() {
         className={uiVisible ? "" : "ui-hidden"}
         onSave={handleSave}
         onFindReplace={handleFindReplace}
+        onNewNote={handleNewNote}
       />
       <StatisticsBar
         text={openNote?.body ?? ""}

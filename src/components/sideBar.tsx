@@ -6,16 +6,17 @@ interface SideBarProps {
   isOpen: boolean;
   onOpenNote: (filename: string) => void;
   activeFilename?: string;
+  refreshKey?: number;
 }
 
-function SideBar({ isOpen, onOpenNote, activeFilename }: SideBarProps) {
+function SideBar({ isOpen, onOpenNote, activeFilename, refreshKey }: SideBarProps) {
   const [noteList, setNoteList] = useState<NoteMetadata[]>([]);
 
   useEffect(() => {
     if (isOpen) {
       listNotes().then(setNoteList);
     }
-  }, [isOpen]);
+  }, [isOpen, refreshKey]);
 
   if (!isOpen) return null;
 
