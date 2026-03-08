@@ -90,12 +90,16 @@ body,
 html,
 body,
 #root {
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
 }
 
 .md-editor-root,
 .md-editor-root .cm-editor,
 .md-editor-root .cm-scroller,
 .md-editor-root .cm-content {
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
 }
