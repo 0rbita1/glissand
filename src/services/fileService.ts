@@ -7,6 +7,16 @@ export interface NoteData {
   modified: string;
 }
 
+export interface NoteMetadata {
+  filename: string;
+  title: string;
+  modified: string;
+}
+
+export async function listNotes(): Promise<NoteMetadata[]> {
+  return await invoke<NoteMetadata[]>("list_notes");
+}
+
 export async function readNote(filename: string): Promise<NoteData> {
   return await invoke<NoteData>("read_note", { filename });
 }
