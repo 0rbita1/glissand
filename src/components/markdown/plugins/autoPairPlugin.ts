@@ -26,9 +26,53 @@ const autoPairHandler = EditorView.inputHandler.of((view, from, to, text) => {
   const state = view.state;
   const docLen = state.doc.length;
 
+  // --- Multi-char pair: ``` → ```\n\n``` ---
+  if (
+    char === "`" &&
+    from >= 2 &&
+    state.doc.sliceString(from - 2, from) === "``"
+  ) {
+    const outerPrev =
+      from > 2 ? state.doc.sliceString(from - 3, from - 2) : undefined;
+    const charAfter =
+      from < docLen ? state.doc.sliceString(from, from + 1) : undefined;
+
+    if (isBoundary(outerPrev) && isBoundary(charAfter)) {
+      view.dispatch({
+        changes: { from, to, insert: "`\n\n```" },
+        selection: { anchor: from + 2 },
+        userEvent: "input.autoPair",
+      });
+      return true;
+    }
+  }
+
+  // --- Multi-char pair: $$ → $$\n\n$$ ---
+  if (
+    char === "$" &&
+    from >= 1 &&
+    state.doc.sliceString(from - 1, from) === "$"
+  ) {
+    const outerPrev =
+      from > 1 ? state.doc.sliceString(from - 2, from - 1) : undefined;
+    const charAfter =
+      from < docLen ? state.doc.sliceString(from, from + 1) : undefined;
+
+    if (isBoundary(outerPrev) && isBoundary(charAfter)) {
+      view.dispatch({
+        changes: { from, to, insert: "$\n\n$$" },
+        selection: { anchor: from + 2 },
+        userEvent: "input.autoPair",
+      });
+      return true;
+    }
+  }
+
+  // --- Single-char logic ---
   const nextChar =
     from < docLen ? state.doc.sliceString(from, from + 1) : undefined;
 
+  // Skip-over: advance past a matching auto-inserted closing character.
   if (CLOSING_SET.has(char) && nextChar === char) {
     view.dispatch({
       selection: { anchor: from + 1 },
@@ -37,6 +81,7 @@ const autoPairHandler = EditorView.inputHandler.of((view, from, to, text) => {
     return true;
   }
 
+  // Auto-pair: only when both neighbours are boundaries.
   if (char in OPENING_MAP) {
     const prevChar =
       from > 0 ? state.doc.sliceString(from - 1, from) : undefined;
@@ -85,8 +130,6 @@ function handleBackspace(view: EditorView): boolean {
   return true;
 }
 
-// Prec.high ensures this runs before defaultKeymap's deleteCharBackward.
-// Without it, defaultKeymap consumes Backspace first and handleBackspace never fires.
 const autoPairBackspace = Prec.high(
   keymap.of([{ key: "Backspace", run: handleBackspace }]),
 );
