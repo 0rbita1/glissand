@@ -25,6 +25,7 @@ import { livePreviewPlugin } from "./plugins/livePreviewPlugin";
 import { mathField } from "./plugins/mathPlugin";
 import { frontmatterPlugin, frontmatterEnd } from "./plugins/frontmatterPlugin";
 import { autoPairPlugin } from "./plugins/autoPairPlugin";
+import { FindReplacePanel } from "./FindReplacePanel";
 
 interface MarkdownEditorProps {
   initialValue?: string;
@@ -55,6 +56,10 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
     const [titleContainer, setTitleContainer] = useState<HTMLElement | null>(
       null,
     );
+    const [panelState, setPanelState] = useState<{
+      dom: HTMLElement;
+      view: EditorView;
+    } | null>(null);
 
     useImperativeHandle(ref, () => ({
       openFindReplace: () => {
@@ -91,7 +96,20 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
             ...historyKeymap,
             ...searchKeymap,
           ]),
-          search(),
+          search({
+            createPanel(view) {
+              const dom = document.createElement("div");
+              dom.className = "cm-find-replace-host";
+              // Defer so the view is fully initialised before React renders into it.
+              setTimeout(() => setPanelState({ dom, view }), 0);
+              return {
+                dom,
+                destroy() {
+                  setPanelState(null);
+                },
+              };
+            },
+          }),
           markdown({
             base: markdownLanguage,
             codeLanguages: languages,
@@ -158,6 +176,11 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
         {titleContainer != null &&
           titleSlot != null &&
           createPortal(titleSlot, titleContainer)}
+        {panelState != null &&
+          createPortal(
+            <FindReplacePanel view={panelState.view} />,
+            panelState.dom,
+          )}
       </>
     );
   },

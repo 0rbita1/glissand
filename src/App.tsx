@@ -178,7 +178,9 @@ function App() {
         activeFilename={openNote?.filename}
         refreshKey={sideBarRefreshKey}
       />
-      <div className={`editorContainer${sideBarOpen ? " editorContainer--shifted" : ""}`}>
+      <div
+        className={`editorContainer${sideBarOpen ? " editorContainer--shifted" : ""}`}
+      >
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
             ref={editorRef}

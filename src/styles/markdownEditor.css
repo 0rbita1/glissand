@@ -333,3 +333,117 @@
 .md-title-input::placeholder {
   color: var(--md-text-faint);
 }
+
+/* ── Find / Replace panel ───────────────────────────────────────────────── */
+
+/* CM injects .cm-panels at the bottom of the editor; reset its styles */
+.md-editor-root .cm-panels {
+  background: transparent;
+  border: none;
+}
+
+.fr-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 10px;
+  background: #252526;
+  border-top: 1px solid #3c3c3c;
+  font-family: var(--md-font-body);
+  font-size: 13px;
+}
+
+.fr-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fr-input {
+  flex: 1;
+  min-width: 0;
+  background: #3c3c3c;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--md-text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 3px 7px;
+  outline: none;
+}
+
+.fr-input:focus {
+  border-color: var(--md-accent);
+}
+
+.fr-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: #cccccc;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.fr-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.fr-close-btn {
+  margin-left: 4px;
+}
+
+.fr-toggles {
+  display: flex;
+  gap: 2px;
+  margin-left: 2px;
+}
+
+.fr-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #888;
+  font-family: var(--md-font-mono);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.fr-toggle-btn:hover {
+  color: #cccccc;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.fr-toggle-btn.active {
+  color: var(--md-accent);
+  border-color: var(--md-accent);
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.fr-text-btn {
+  background: transparent;
+  border: 1px solid #3c3c3c;
+  border-radius: 3px;
+  color: #cccccc;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 3px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fr-text-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #555;
+}
