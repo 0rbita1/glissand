@@ -57,7 +57,7 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
       null,
     );
     const [panelState, setPanelState] = useState<{
-      dom: HTMLElement;
+      overlay: HTMLElement;
       view: EditorView;
     } | null>(null);
 
@@ -98,14 +98,19 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
           ]),
           search({
             createPanel(view) {
+              // Placeholder node CM manages for show/hide lifecycle.
               const dom = document.createElement("div");
-              dom.className = "cm-find-replace-host";
-              // Defer so the view is fully initialised before React renders into it.
-              setTimeout(() => setPanelState({ dom, view }), 0);
+              // Actual panel lives in document.body so position:fixed is unaffected
+              // by any ancestor overflow/transform on the editor tree.
+              const overlay = document.createElement("div");
+              overlay.className = "fr-overlay";
+              document.body.appendChild(overlay);
+              setTimeout(() => setPanelState({ overlay, view }), 0);
               return {
                 dom,
                 destroy() {
                   setPanelState(null);
+                  overlay.remove();
                 },
               };
             },
@@ -179,7 +184,7 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
         {panelState != null &&
           createPortal(
             <FindReplacePanel view={panelState.view} />,
-            panelState.dom,
+            panelState.overlay,
           )}
       </>
     );
