@@ -7,8 +7,8 @@ export interface NoteData {
   modified: string;
 }
 
-export async function readNote(): Promise<NoteData> {
-  return await invoke<NoteData>("read_note");
+export async function readNote(filename: string): Promise<NoteData> {
+  return await invoke<NoteData>("read_note", { filename });
 }
 
 export async function writeNote(

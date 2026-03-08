@@ -5,8 +5,6 @@ use tauri::{AppHandle, Manager};
 use serde::{Deserialize, Serialize};
 use chrono::Utc;
 
-const NOTE_FILENAME: &str = "initialNote.md";
-
 // ---------------------------------------------------------------------------
 // Frontmatter
 // ---------------------------------------------------------------------------
@@ -64,14 +62,6 @@ struct NoteData {
 // Path helpers
 // ---------------------------------------------------------------------------
 
-fn get_note_path(app: &AppHandle) -> Result<PathBuf, String> {
-    let data_dir = app
-        .path()
-        .app_local_data_dir()
-        .map_err(|e| e.to_string())?;
-    Ok(data_dir.join(NOTE_FILENAME))
-}
-
 fn get_named_note_path(app: &AppHandle, filename: &str) -> Result<PathBuf, String> {
     let data_dir = app
         .path()
@@ -87,8 +77,8 @@ fn get_named_note_path(app: &AppHandle, filename: &str) -> Result<PathBuf, Strin
 /// Reads the note, parses any frontmatter, and returns title + body separately.
 /// If the file doesn't exist or has no frontmatter, empty defaults are returned.
 #[tauri::command]
-fn read_note(app: AppHandle) -> Result<NoteData, String> {
-    let note_path = get_note_path(&app)?;
+fn read_note(app: AppHandle, filename: String) -> Result<NoteData, String> {
+    let note_path = get_named_note_path(&app, &filename)?;
 
     if !note_path.exists() {
         return Ok(NoteData {

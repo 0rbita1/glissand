@@ -33,7 +33,7 @@ function App() {
 
   useEffect(() => {
     setLoadState("loading");
-    readNote()
+    readNote(currentFilenameRef.current + ".md")
       .then((data) => {
         setText(data.body);
         setTitle(data.title);
