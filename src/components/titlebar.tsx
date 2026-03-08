@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { PanelLeft } from "lucide-react";
 import "../styles/titleBar.css";
 
 function Titlebar() {
@@ -25,7 +26,14 @@ function Titlebar() {
 
   return (
     <div className="titlebar" data-tauri-drag-region>
-      <div className="titlebar-title" data-tauri-drag-region></div>
+      <div className="titlebar-left">
+        <button
+          className="titlebar-btn sidebar-toggle-btn"
+          title="Toggle sidebar"
+        >
+          <PanelLeft size={14} />
+        </button>
+      </div>
       <div className="titlebar-controls">
         {/* Always on Top - extra button */}
         <button

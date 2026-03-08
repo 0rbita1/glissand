@@ -12,8 +12,19 @@
   z-index: 1000;
 }
 
-.titlebar-title {
-  padding-left: 12px;
+.titlebar-left {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.titlebar-btn.sidebar-toggle-btn {
+  width: 40px;
+  color: #888;
+}
+
+.titlebar-btn.sidebar-toggle-btn:hover {
+  color: #dadada;
 }
 
 .titlebar-controls {
