@@ -37,7 +37,7 @@ function App() {
   const openNoteRef = useRef<OpenNote | null>(null);
   openNoteRef.current = openNote;
 
-  const uiVisible = useAutoHideUI();
+  const uiVisible = useAutoHideUI(sideBarOpen);
 
   function loadNote(filename: string) {
     setLoadState("loading");
