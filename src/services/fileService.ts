@@ -13,6 +13,10 @@ export interface NoteMetadata {
   modified: string;
 }
 
+export async function createNote(): Promise<string> {
+  return await invoke<string>("create_note");
+}
+
 export async function listNotes(): Promise<NoteMetadata[]> {
   return await invoke<NoteMetadata[]>("list_notes");
 }
