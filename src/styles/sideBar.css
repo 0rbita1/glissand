@@ -16,10 +16,11 @@
 }
 
 .sidebar-note-item {
-  padding: 6px 16px;
-  font-size: 13px;
-  color: #cccccc;
-  cursor: default;
+  padding: 2px 16px;
+  font-size: 12px;
+  font-family: var(--md-font-body);
+  color: var(--md-text);
+  cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -27,4 +28,9 @@
 
 .sidebar-note-item:hover {
   background: rgba(255, 255, 255, 0.07);
+}
+
+.sidebar-note-item.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
 }

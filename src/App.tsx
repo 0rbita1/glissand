@@ -125,7 +125,11 @@ function App() {
   return (
     <>
       <Titlebar onToggleSidebar={() => setSideBarOpen((o) => !o)} />
-      <SideBar isOpen={sideBarOpen} />
+      <SideBar
+        isOpen={sideBarOpen}
+        onOpenNote={loadNote}
+        activeFilename={openNote?.filename}
+      />
       <div className="editorContainer">
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor

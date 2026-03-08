@@ -4,9 +4,11 @@ import "../styles/sideBar.css";
 
 interface SideBarProps {
   isOpen: boolean;
+  onOpenNote: (filename: string) => void;
+  activeFilename?: string;
 }
 
-function SideBar({ isOpen }: SideBarProps) {
+function SideBar({ isOpen, onOpenNote, activeFilename }: SideBarProps) {
   const [noteList, setNoteList] = useState<NoteMetadata[]>([]);
 
   useEffect(() => {
@@ -21,8 +23,14 @@ function SideBar({ isOpen }: SideBarProps) {
     <div className="sidebar">
       <ul className="sidebar-note-list">
         {noteList.map((note) => (
-          <li key={note.filename} className="sidebar-note-item">
-            {note.filename}
+          <li
+            key={note.filename}
+            className={`sidebar-note-item${
+              note.filename === activeFilename ? " active" : ""
+            }`}
+            onClick={() => onOpenNote(note.filename)}
+          >
+            {note.filename.replace(/\.md$/, "")}
           </li>
         ))}
       </ul>
