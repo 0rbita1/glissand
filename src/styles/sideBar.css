@@ -4,7 +4,7 @@
   left: 0;
   width: 300px;
   height: calc(100vh - 32px);
-  background: #1e1e1e;
+  background: var(--md-border);
   z-index: 900;
   overflow-y: auto;
   transform: translateX(-100%);
@@ -37,6 +37,6 @@
 }
 
 .sidebar-note-item.active {
-  color: #ffffff;
+  color: var(--md-text);
   background: rgba(255, 255, 255, 0.12);
 }

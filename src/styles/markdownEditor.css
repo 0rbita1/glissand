@@ -139,7 +139,7 @@
 .md-editor-root .md-code {
   font-family: var(--md-font-mono);
   font-size: 0.85em;
-  background: #242424;
+  background: var(--md-code-bg);
   color: var(--md-text);
   border-radius: 3px;
   padding: 0.1em 0.35em;
@@ -168,7 +168,7 @@
 .md-editor-root .md-codeblock {
   font-family: var(--md-font-mono);
   font-size: 0.85rem;
-  background: #242424;
+  background: var(--md-code-bg);
   color: var(--md-text);
   display: block;
   padding: 0.25em 0.75em;
@@ -177,7 +177,7 @@
 .md-editor-root .md-hr {
   display: block;
   border: none;
-  border-top: 1px solid #363636;
+  border-top: 1px solid var(--md-border);
   color: var(--md-text-faint);
   padding-bottom: 1rem;
 }
@@ -208,7 +208,7 @@
   color: var(--md-red);
   font-family: var(--md-font-mono);
   font-size: 0.8rem;
-  background: #27272a;
+  background: var(--md-surface);
   padding: 0.25em 0.5em;
   border-radius: 4px;
   border: 1px solid var(--md-border);
@@ -250,7 +250,7 @@
 
 .md-math-block:hover {
   border-left-color: var(--md-accent);
-  background: #1f1f23;
+  background: var(--md-surface);
 }
 
 .md-math-block .katex-display {
@@ -271,7 +271,7 @@
   color: var(--md-red);
   font-family: var(--md-font-mono);
   font-size: 0.85rem;
-  background: #27272a;
+  background: var(--md-surface);
   padding: 0.1em 0.35em;
   border-radius: 3px;
   border: 1px solid var(--md-border);
@@ -340,7 +340,7 @@
    DOM so position:fixed is always relative to the viewport. */
 .fr-overlay {
   position: fixed;
-  bottom: 110px;
+  top: 42px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 950;

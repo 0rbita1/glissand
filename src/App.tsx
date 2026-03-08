@@ -37,6 +37,7 @@ interface OpenNote {
 function App() {
   const [sideBarOpen, setSideBarOpen] = useState(false);
   const [sideBarRefreshKey, setSideBarRefreshKey] = useState(0);
+  const [isDayMode, setIsDayMode] = useState(false);
   const [openNote, setOpenNote] = useState<OpenNote | null>(null);
   const [lastModified, setLastModified] = useState<Date | null>(null);
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
@@ -157,7 +158,15 @@ function App() {
   }
 
   function handleFindReplace() {
-    editorRef.current?.openFindReplace();
+    editorRef.current?.toggleFindReplace();
+  }
+
+  function handleToggleDayNight() {
+    setIsDayMode((prev) => {
+      const next = !prev;
+      document.documentElement.dataset.theme = next ? "day" : "";
+      return next;
+    });
   }
 
   function handleTitleKeyDown(
@@ -206,6 +215,8 @@ function App() {
         onFindReplace={handleFindReplace}
         onNewNote={handleNewNote}
         onDeleteNote={handleDeleteNote}
+        onDayNight={handleToggleDayNight}
+        isDayMode={isDayMode}
       />
       <StatisticsBar
         text={openNote?.body ?? ""}

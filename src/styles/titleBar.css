@@ -1,6 +1,6 @@
 .titlebar {
   height: 32px;
-  background: #1e1e1e;
+  background: var(--md-border);
   user-select: none;
   display: flex;
   align-items: center;
@@ -36,7 +36,7 @@
   appearance: none;
   border: none;
   background: transparent;
-  color: #dadada;
+  color: var(--app-text);
   width: 46px;
   height: 32px;
   display: inline-flex;

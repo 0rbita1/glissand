@@ -26,12 +26,16 @@ function HotBar({
   onFindReplace,
   onNewNote,
   onDeleteNote,
+  onDayNight,
+  isDayMode = false,
 }: {
   className?: string;
   onSave?: () => void;
   onFindReplace?: () => void;
   onNewNote?: () => void;
   onDeleteNote?: () => void;
+  onDayNight?: () => void;
+  isDayMode?: boolean;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -40,6 +44,7 @@ function HotBar({
     "find-replace": onFindReplace,
     "new-note": onNewNote,
     "delete-note": onDeleteNote,
+    "day-night": onDayNight,
   };
 
   return (
@@ -52,7 +57,7 @@ function HotBar({
           onMouseLeave={() => setHoveredId(null)}
         >
           <button
-            className="hotBar-btn"
+            className={`hotBar-btn${id === "day-night" && isDayMode ? " hotBar-btn--active" : ""}`}
             aria-label={label}
             onClick={handlers[id]}
           >

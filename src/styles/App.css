@@ -4,14 +4,18 @@
   line-height: 1.75;
   font-weight: 400;
 
-  color: #dadada;
-  background-color: #1e1e1e;
+  color: var(--app-text);
+  background-color: var(--app-bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  /* app-level tokens */
+  --app-bg: #1e1e1e;
+  --app-text: #dadada;
 
   /* markdown editor tokens — kept here to avoid :root duplication */
   --md-bg: #0f0f10;
@@ -26,6 +30,7 @@
   --md-cyan: #22d3ee;
   --md-green: #4ade80;
   --md-red: #f87171;
+  --md-code-bg: #242424;
 
   --md-font-body: "Inter", Avenir, Helvetica, Arial, sans-serif;
   --md-font-mono: "JetBrains Mono", "Fira Code", monospace;
@@ -34,6 +39,26 @@
   --md-content-width: 750px;
   /* Scales from 1rem at 400 px window width to 2rem at 800 px, then stays at 2rem */
   --md-padding: clamp(1rem, 4vw, 2rem);
+}
+
+/* ── Day mode overrides ─────────────────────────────────────────────────── */
+html[data-theme="day"] {
+  --app-bg: #f0f2f5;
+  --app-text: #18181b;
+
+  --md-bg: #f0f2f5;
+  --md-surface: #ffffff;
+  --md-border: #d4d4d8;
+  --md-text: #18181b;
+  --md-text-muted: #71717a;
+  --md-text-faint: #a1a1aa;
+  --md-accent: #0284c7;
+  --md-accent-dim: #0284c733;
+  --md-gold: #d97706;
+  --md-cyan: #0891b2;
+  --md-green: #16a34a;
+  --md-red: #dc2626;
+  --md-code-bg: #e4e4e7;
 }
 
 /* Prevent body-level overflow */

@@ -17,7 +17,12 @@ import {
   historyKeymap,
   indentWithTab,
 } from "@codemirror/commands";
-import { search, searchKeymap, openSearchPanel } from "@codemirror/search";
+import {
+  search,
+  searchKeymap,
+  openSearchPanel,
+  closeSearchPanel,
+} from "@codemirror/search";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { GFM, Strikethrough, Table, TaskList } from "@lezer/markdown";
@@ -36,7 +41,7 @@ interface MarkdownEditorProps {
 }
 
 export interface MarkdownEditorHandle {
-  openFindReplace: () => void;
+  toggleFindReplace: () => void;
   focusAtStart: () => void;
 }
 
@@ -61,21 +66,30 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
       view: EditorView;
     } | null>(null);
 
-    useImperativeHandle(ref, () => ({
-      openFindReplace: () => {
-        if (viewRef.current) openSearchPanel(viewRef.current);
-      },
-      focusAtStart: () => {
-        const view = viewRef.current;
-        if (view) {
-          view.focus();
-          const fm = frontmatterEnd(view.state);
-          view.dispatch({
-            selection: { anchor: fm === -1 ? 0 : fm },
-          });
-        }
-      },
-    }));
+    useImperativeHandle(
+      ref,
+      () => ({
+        toggleFindReplace: () => {
+          if (!viewRef.current) return;
+          if (panelState) {
+            closeSearchPanel(viewRef.current);
+          } else {
+            openSearchPanel(viewRef.current);
+          }
+        },
+        focusAtStart: () => {
+          const view = viewRef.current;
+          if (view) {
+            view.focus();
+            const fm = frontmatterEnd(view.state);
+            view.dispatch({
+              selection: { anchor: fm === -1 ? 0 : fm },
+            });
+          }
+        },
+      }),
+      [panelState],
+    );
 
     const onChangeRef = useRef(onChange);
     useEffect(() => {

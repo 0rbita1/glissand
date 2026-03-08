@@ -20,7 +20,7 @@
   height: 44px;
   z-index: 900;
   pointer-events: auto;
-  color: #dadada;
+  color: var(--app-text);
   user-select: none;
   opacity: 1;
   transition: opacity 0.4s ease;
@@ -35,7 +35,7 @@
   appearance: none;
   border: none;
   background: transparent;
-  color: white;
+  color: var(--app-text);
   width: 36px;
   height: 36px;
   display: inline-flex;
@@ -50,12 +50,16 @@
 }
 
 .hotBar-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: rgba(128, 128, 128, 0.15);
+  color: var(--app-text);
 }
 
 .hotBar-btn:active {
   background: rgba(255, 255, 255, 0.15);
+}
+
+.hotBar-btn--active {
+  color: #ffd600;
 }
 
 .hotBar-btn-wrapper {
@@ -68,8 +72,8 @@
   bottom: 140%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(30, 30, 30, 0.95);
-  color: #dadada;
+  background: var(--md-text-muted);
+  color: var(--app-bg);
   padding: 4px 12px;
   border-radius: 6px;
   font-size: 0.95rem;
