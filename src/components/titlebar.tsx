@@ -3,7 +3,11 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { PanelLeft } from "lucide-react";
 import "../styles/titleBar.css";
 
-function Titlebar() {
+interface TitlebarProps {
+  onToggleSidebar: () => void;
+}
+
+function Titlebar({ onToggleSidebar }: TitlebarProps) {
   const [alwaysOnTop, setAlwaysOnTop] = useState(false);
   const appWindowRef = useRef<Awaited<
     ReturnType<typeof getCurrentWindow>
@@ -30,6 +34,7 @@ function Titlebar() {
         <button
           className="titlebar-btn sidebar-toggle-btn"
           title="Toggle sidebar"
+          onClick={onToggleSidebar}
         >
           <PanelLeft size={14} />
         </button>

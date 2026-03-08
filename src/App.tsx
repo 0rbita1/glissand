@@ -11,6 +11,7 @@ import { useAutoSave } from "./hooks/useAutoSave";
 import { useAutoHideUI } from "./hooks/useAutoHideUI";
 import type { NoteLoadState } from "./types/note.types";
 import HotBar from "./components/hotBar";
+import SideBar from "./components/sideBar";
 import { debounce } from "./utils/debounce";
 
 const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g;
@@ -27,6 +28,7 @@ interface OpenNote {
 }
 
 function App() {
+  const [sideBarOpen, setSideBarOpen] = useState(false);
   const [openNote, setOpenNote] = useState<OpenNote | null>(null);
   const [lastModified, setLastModified] = useState<Date | null>(null);
   const [loadState, setLoadState] = useState<NoteLoadState>("idle");
@@ -122,7 +124,8 @@ function App() {
 
   return (
     <>
-      <Titlebar />
+      <Titlebar onToggleSidebar={() => setSideBarOpen((o) => !o)} />
+      <SideBar isOpen={sideBarOpen} />
       <div className="editorContainer">
         {(loadState === "ready" || loadState === "error") && (
           <MarkdownEditor
