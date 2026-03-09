@@ -246,7 +246,7 @@ function App() {
       )}
       <StatisticsBar
         text={openNote?.body ?? ""}
-        lastModified={openNote?.modified ?? ""}
+        lastModified={lastModified?.toISOString() ?? ""}
         className={statsBarVisible ? "" : "ui-hidden"}
       />
     </>
